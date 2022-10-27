@@ -6,53 +6,83 @@ import { createNativeStackNavigator } from '@react-navigation/stack';
 
 
 export default class Menu extends React.Component {
-    constructor(props) {
-        super(props);
+  constructor(props) { //per passare proprieta did ef acnhe il navigation
+    super(props);
+    this.state = {
+      value: '',
+      usernameScelto: false,
     }
-    render() {
-        return (
-            
-            <View style={styles.containerHome}>
-                <Text style={styles.titleHome}>Ciao, NOME</Text>
-                <View style={{position: 'absolute',flexDirection: 'row', top: '20%',}}>
-                    <Button color="red" title='Partita Casuale' onPress={() => this.props.navigation.navigate('Menu')}></Button>
+  }
+  onChangeTextHandler = (text) => {
+    this.setState({ value: text })
+  }
+  eseguiBottone = () => {
+    this.setState({ usernameScelto:!this.state.usernameScelto  })
+  }
+  render() {
+    if (this.state.usernameScelto == false) {
+      return (
+        <View style={styles.containerHome}>
+          <Text style={styles.titleHome}>TOMBOLA</Text>
+          <TextInput value={this.state.value} style={styles.inputNickname} placeholder="scegli nickname" onChangeText={this.onChangeTextHandler}></TextInput>
+          <Button color="red" title='Gioca!' onPress={() => this.eseguiBottone()}></Button>
+          <StatusBar style="auto" />
+        </View>
+      );
+    }
+    else {
+      return (
+        <View style={styles.containerHome}>
+          <Text style={styles.titleNick}>il tuo username e: {this.state.value}</Text>
+                <View style={{position: 'absolute',/*flexDirection: 'row',*/ top: '20%',}}>
                     <Button color="red" title='Crea Partita' onPress={() => this.props.navigation.navigate('CreaPartita')}></Button>
                 </View>
                 <Text style={styles.titleLista}>lista partite attive</Text>
                 <Text style={styles.titleLista}>lista partite attive</Text>
                 <Text style={styles.titleLista}>lista partite attive</Text>
-                <Text style={styles.titleLista}>lista partite attive</Text>
-                
-                <StatusBar style="auto" />
-            </View>
-           
-        );
+                <Button color="red" title='Indietro' onPress={() => this.eseguiBottone()}></Button>
+        </View>
+      );
     }
+  }
 }
 
 
 const styles = StyleSheet.create({
-  
-    containerHome: {
-        flex: 1,
-        backgroundColor: 'yellow',
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    titleHome: {
-        position: 'absolute',
-        color: 'red',
-        fontSize: '40%',
-        top: '5%',
-        fontWeight: 'bold',
-        alignItems: 'center',
-
-    },
-    titleLista: {
-        color: 'black',
-        fontSize: '20%',
-    },
-
-    /*style={{padding: 50}}*/
+  containerHome: {
+    flex: 1,
+    backgroundColor: 'yellow',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  titleHome: {
+    color: 'red',
+    fontSize: '40%',
+    fontWeight: 'bold',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  inputNickname: {
+    height: 30,
+    margin: '1%',
+    borderWidth: 1,
+    padding: 5,
+    width: 150,
+    backgroundColor: 'white',
+    borderRadius: 5,
+  },
+  titleNick: {
+    position: 'absolute',
+    color: 'red',
+    fontSize: '20%',
+    fontWeight: 'bold',
+    alignItems: 'center',
+    top: '10%',
+  },
+  titleLista: {
+    color: 'black',
+    fontSize: '20%',
+},
+  /*style={{padding: 50}}*/
 });
 
