@@ -6,6 +6,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Nickname from './components/componenteNickname.js';
 import Menu from './components/componenteMenu.js';
 import CreaPartita from './components/componentePartita.js';
+import SceltaCartelle from './components/componenteSceltaCartelle.js';
 
 const Stack = createNativeStackNavigator();
 
@@ -17,6 +18,8 @@ export default function App() {
             <Stack.Screen /*options={{ headerShown: false }}*/ name="Home" component={Nickname} />
             <Stack.Screen /*options={{ headerShown: false }}*/ name="Menu" component={Menu} />
             <Stack.Screen /*options={{ headerShown: false }}*/ name="CreaPartita" component={CreaPartita} />
+            <Stack.Screen /*options={{ headerShown: false }}*/ name="SceltaCartelle" component={SceltaCartelle} />
+            
          </Stack.Navigator>
       </NavigationContainer>
      

@@ -5,33 +5,17 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/stack';
 import BouncyCheckbox from "react-native-bouncy-checkbox";
 import BouncyCheckboxGroup from "react-native-bouncy-checkbox-group";
-import  ICheckboxButton from "react-native-bouncy-checkbox-group";
+import ICheckboxButton from "react-native-bouncy-checkbox-group";
 
-export default class CreaPartita extends React.Component {
-    constructor(props) { //per passare proprieta did ef acnhe il navigation
-        super(props);
-        this.state = {
-            value: '',
-        }
-      
-    }
-    onChangeTextHandler = (text) => {
-        this.setState({ value: text })
-    }
-   
-    eseguiBottone = () => {
+export default class SceltaCartelle extends React.Component {
 
-    }
     render() {
         return (
 
             <View style={styles.containerHome}>
-                <Text style={styles.titleHome}>Nuova Partita</Text>
-                <View style={{ position: 'absolute', flexDirection: 'column', top: '20%', }}>
-                    <TextInput value={this.state.value} style={styles.inputNickname} placeholder="Nome Partita" onChangeText={this.onChangeTextHandler}></TextInput>
-                </View>
-               
-                <Button color="red" title='Crea' onPress={() => this.props.navigation.navigate('SceltaCartelle')}></Button>
+                <Text style={styles.titleHome}>Scegli quante cartelle vuoi:</Text>
+
+                <Button color="red" title='Inizia' onPress={() => this.props.navigation.navigate('Home')}></Button>
 
                 <StatusBar style="auto" />
             </View>
