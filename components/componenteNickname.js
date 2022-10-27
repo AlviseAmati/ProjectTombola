@@ -6,7 +6,7 @@ import { createNativeStackNavigator } from '@react-navigation/stack';
 
 
 export default class Nickname extends React.Component {
-  constructor(props) {
+  constructor(props) { //per passare proprieta did ef acnhe il navigation
     super(props);
     this.state = {
       value: '',
