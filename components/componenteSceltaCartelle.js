@@ -5,18 +5,41 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/stack';
 import BouncyCheckbox from "react-native-bouncy-checkbox";
 import BouncyCheckboxGroup from "react-native-bouncy-checkbox-group";
-import ICheckboxButton from "react-native-bouncy-checkbox-group";
 
 export default class SceltaCartelle extends React.Component {
 
     render() {
+        const verticalStaticData = [
+            {
+              id: 0,
+              text: '1',
+            },
+            {
+              id: 1,
+              text: '2',
+            },
+            {
+              id: 2,
+              text: '3',
+            },
+            {
+              id: 3,
+              text: '4',
+            },
+          ];
         return (
 
             <View style={styles.containerHome}>
                 <Text style={styles.titleHome}>Scegli quante cartelle vuoi:</Text>
-
+                <BouncyCheckboxGroup
+                    data={verticalStaticData}
+                    style={{ flexDirection: "column" }}
+                    onChange={(selectedItem) => {
+                        console.log("SelectedItem: ", JSON.stringify(selectedItem));
+                    }}
+                />
                 <Button color="red" title='Inizia' onPress={() => this.props.navigation.navigate('Home')}></Button>
-
+               
                 <StatusBar style="auto" />
             </View>
 
