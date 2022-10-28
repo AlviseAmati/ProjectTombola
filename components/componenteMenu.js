@@ -11,13 +11,17 @@ export default class Menu extends React.Component {
     this.state = {
       value: '',
       usernameScelto: false,
+      partitaCreata: false,
     }
   }
   onChangeTextHandler = (text) => {
     this.setState({ value: text })
   }
-  eseguiBottone = () => {
-    this.setState({ usernameScelto:!this.state.usernameScelto  })
+  eseguiBottoneNick = () => {
+    this.setState({ usernameScelto: !this.state.usernameScelto })
+  }
+  eseguiBottonePartita = () => {
+    this.setState({ partitaCreata: !this.state.partitaCreata })
   }
   render() {
     if (this.state.usernameScelto == false) {
@@ -25,23 +29,40 @@ export default class Menu extends React.Component {
         <View style={styles.containerHome}>
           <Text style={styles.titleHome}>TOMBOLA</Text>
           <TextInput value={this.state.value} style={styles.inputNickname} placeholder="scegli nickname" onChangeText={this.onChangeTextHandler}></TextInput>
-          <Button color="red" title='Gioca!' onPress={() => this.eseguiBottone()}></Button>
+          <Button color="red" title='Gioca!' onPress={() => this.eseguiBottoneNick()}></Button>
           <StatusBar style="auto" />
+        </View>
+      );
+    }
+    else if (this.state.partitaCreata == false) {
+      return (
+        <View style={styles.containerHome}>
+          <Text style={styles.titleNick}>il tuo username e: {this.state.value}</Text>
+          <View style={{ position: 'absolute',/*flexDirection: 'row',*/ top: '20%', }}>
+            <Button color="red" title='Crea Partita' onPress={() => this.eseguiBottonePartita()}></Button>
+          </View>
+          <Text style={styles.titleLista}>lista partite attive</Text>
+          <Text style={styles.titleLista}>lista partite attive</Text>
+          <Text style={styles.titleLista}>lista partite attive</Text>
+          <Button color="red" title='Indietro' onPress={() => this.eseguiBottoneNick()}></Button>
         </View>
       );
     }
     else {
       return (
+
         <View style={styles.containerHome}>
-          <Text style={styles.titleNick}>il tuo username e: {this.state.value}</Text>
-                <View style={{position: 'absolute',/*flexDirection: 'row',*/ top: '20%',}}>
-                    <Button color="red" title='Crea Partita' onPress={() => this.props.navigation.navigate('CreaPartita')}></Button>
-                </View>
-                <Text style={styles.titleLista}>lista partite attive</Text>
-                <Text style={styles.titleLista}>lista partite attive</Text>
-                <Text style={styles.titleLista}>lista partite attive</Text>
-                <Button color="red" title='Indietro' onPress={() => this.eseguiBottone()}></Button>
+          <Text style={styles.titleHome}>Creazione Partita</Text>
+
+          <View style={{   }}>
+            <TextInput value={this.state.value} style={styles.inputNickname} placeholder="Nome Partita Automatico" onChangeText={this.onChangeTextHandler}></TextInput>
+          </View>
+
+          <Button color="red" title='Crea' onPress={() => this.props.navigation.navigate('CreaPartita')}></Button>
+          <Button color="red" title='Indietro' onPress={() => this.eseguiBottoneNick()}></Button>
+          <StatusBar style="auto" />
         </View>
+
       );
     }
   }
@@ -82,7 +103,7 @@ const styles = StyleSheet.create({
   titleLista: {
     color: 'black',
     fontSize: '20%',
-},
+  },
   /*style={{padding: 50}}*/
 });
 

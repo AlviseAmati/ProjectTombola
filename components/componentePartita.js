@@ -5,35 +5,49 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/stack';
 import BouncyCheckbox from "react-native-bouncy-checkbox";
 import BouncyCheckboxGroup from "react-native-bouncy-checkbox-group";
-import  ICheckboxButton from "react-native-bouncy-checkbox-group";
+import ICheckboxButton from "react-native-bouncy-checkbox-group";
+import { Table, TableWrapper, Row, Rows, Col, Cols, Cell } from 'react-native-table-component';
 
 export default class CreaPartita extends React.Component {
     constructor(props) { //per passare proprieta did ef acnhe il navigation
         super(props);
         this.state = {
-            value: '',
+
+            tableData1: [
+                ['', '', '21', '33', '', '52', '64', '', '84'],
+                ['6', '', '25', '', '45', '55', '', '74', ''],
+                ['9', '19', '', '38', '', '', '69', '', '89']
+
+            ],
+            tableData2: [
+                ['', '', '21', '33', '', '52', '64', '', '84'],
+                ['6', '', '25', '', '45', '55', '', '74', ''],
+                ['9', '19', '', '38', '', '', '69', '', '89']
+
+            ]
         }
-      
-    }
-    onChangeTextHandler = (text) => {
-        this.setState({ value: text })
-    }
-   
-    eseguiBottone = () => {
 
     }
+    generaNumero = () => {
+        this.setState({ partitaCreata: !this.state.partitaCreata })
+      }
+
     render() {
+        const state = this.state;
         return (
 
-            <View style={styles.containerHome}>
-                <Text style={styles.titleHome}>Nuova Partita</Text>
-                <View style={{ position: 'absolute', flexDirection: 'column', top: '20%', }}>
-                    <TextInput value={this.state.value} style={styles.inputNickname} placeholder="Nome Partita" onChangeText={this.onChangeTextHandler}></TextInput>
-                </View>
-               
-                <Button color="red" title='Crea' onPress={() => this.props.navigation.navigate('SceltaCartelle')}></Button>
+            <View style={styles.containerPartita}>
+                <View style={{ flexDirection: 'column', alignItems: 'center' }}>
+                    <Table style={styles.tablePartita} borderStyle={{ borderWidth: 2, borderColor: 'black' }}>
+                        <Rows data={state.tableData1} style={styles.text} />
+                    </Table>
 
-                <StatusBar style="auto" />
+                    <Table style={styles.tablePartita} borderStyle={{ borderWidth: 2, borderColor: 'black' }}>
+                        <Rows data={state.tableData2} style={styles.text} />
+                    </Table>
+                </View>
+                <Button color="red" title='Genera Numero' onPress={() => this.generaNumero()}></Button>
+                <Button color="red" title='Exit' onPress={() => this.props.navigation.navigate('Home')}></Button>
             </View>
 
         );
@@ -42,6 +56,16 @@ export default class CreaPartita extends React.Component {
 
 
 const styles = StyleSheet.create({
+
+    containerPartita: { flex: 1, padding: 16, paddingTop: 30, backgroundColor: 'yellow' },
+    head: { height: 40, backgroundColor: '#f1f8ff' },
+    text: { margin: 2, alignItems: 'center' },
+
+    tablePartita: {
+        backgroundColor: 'white',
+        width: '40%',
+        marginTop: '5%',
+    },
 
     containerHome: {
         flex: 1,

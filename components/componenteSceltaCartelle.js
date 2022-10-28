@@ -1,3 +1,6 @@
+//NON USATA PER ORA STA PAGINA
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
 import { StatusBar } from 'expo-status-bar';
 import React from 'react';
 import { StyleSheet, Text, View, TextInput, Button } from 'react-native';
