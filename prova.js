@@ -9,7 +9,7 @@ import ICheckboxButton from "react-native-bouncy-checkbox-group";
 import { Table, TableWrapper, Row, Rows, Col, Cols, Cell } from 'react-native-table-component';
 
 export default class CreaPartita extends React.Component {
-    constructor(props) { //per passare proprieta did ef acnhe il navigation
+    constructor(props) { //per passare proprieta did ef acnhe il navigation ....
         super(props);
         this.state = {
 
