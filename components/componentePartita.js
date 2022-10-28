@@ -152,4 +152,3 @@ const styles = StyleSheet.create({
 
     /*style={{padding: 50}}*/
 });
-
