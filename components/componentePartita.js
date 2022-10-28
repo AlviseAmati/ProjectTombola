@@ -1,6 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import React from 'react';
-import { StyleSheet, Text, View, TextInput, Button } from 'react-native';
+import { StyleSheet, Text, View, TextInput, Button, TouchableOpacity, Alert } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/stack';
 import BouncyCheckbox from "react-native-bouncy-checkbox";
@@ -32,32 +32,42 @@ export default class CreaPartita extends React.Component {
     generaNumero = (numero) => {
         numero = Math.floor(Math.random() * 90) + 1;
         this.setState({ numero: numero })
-      }
+    }
+    _alertIndex(index) {
+        Alert.alert(`This is row ${index + 1}`);
+    }
 
     render() {
         const state = this.state;
         const verticalStaticData = [
             {
-              id: 0,
-              text: 'Ambo',
+                id: 0,
+                text: 'Ambo',
             },
             {
-              id: 1,
-              text: 'Terno',
+                id: 1,
+                text: 'Terno',
             },
             {
-              id: 2,
-              text: 'Quaterna',
+                id: 2,
+                text: 'Quaterna',
             },
             {
-              id: 3,
-              text: 'Cinquina',
+                id: 3,
+                text: 'Cinquina',
             },
             {
                 id: 4,
                 text: 'Tombola!',
-              },
-          ];
+            },
+        ];
+        const element = (data, index) => (
+            <TouchableOpacity onPress={() => this._alertIndex(index)}>
+                <View style={styles.btn}>
+                    <Text style={styles.btnText}>{data}</Text>
+                </View>
+            </TouchableOpacity>
+        );
         return (
 
             <View style={styles.containerPartita}>
@@ -66,18 +76,28 @@ export default class CreaPartita extends React.Component {
                         <Rows data={state.tableData1} style={styles.text} />
                     </Table>
                     <Table style={styles.tablePartita} borderStyle={{ borderWidth: 2, borderColor: 'black' }}>
-                        <Rows data={state.tableData2} style={styles.text} />
+                        {
+                        state.tableData1.map((rowData, index) => (
+                            <TableWrapper key={index} style={styles.row}>
+                                {
+                                    rowData.map((cellData, cellIndex) => (
+                                        <Cell key={cellIndex} data={  element(cellData, index) } textStyle={styles.text} />
+                                    ))
+                                }
+                            </TableWrapper>
+                        ))}
+
                     </Table>
                 </View>
                 <Text style={styles.titleNick}>il numero e: {this.state.numero}</Text>
                 <Button color="red" title='Genera Numero' onPress={() => this.generaNumero()}></Button>
-                <BouncyCheckboxGroup style={{ marginBottom: '5%',marginTop: '5%',flexDirection: 'row', justifyContent: 'center' }}
+                <BouncyCheckboxGroup style={{ color: 'red', marginBottom: '5%', marginTop: '5%', flexDirection: 'row', justifyContent: 'center' }}
                     data={verticalStaticData}
                     onChange={(selectedItem) => {
                         console.log("SelectedItem: ", JSON.stringify(selectedItem));
                     }}
                 />
-                <Button  color="red" title='Exit' onPress={() => this.props.navigation.navigate('Home')}></Button>
+                <Button color="red" title='Exit' onPress={() => this.props.navigation.navigate('Home')}></Button>
             </View>
 
         );
@@ -90,6 +110,7 @@ const styles = StyleSheet.create({
     containerPartita: { flex: 1, padding: 16, paddingTop: 30, backgroundColor: 'yellow' },
     head: { height: 40, backgroundColor: '#f1f8ff' },
     text: { margin: 2, alignItems: 'center' },
+    row: { flexDirection: 'row', backgroundColor: 'white' },
 
     tablePartita: {
         backgroundColor: 'white',
@@ -124,9 +145,6 @@ const styles = StyleSheet.create({
         width: 150,
         backgroundColor: 'white',
         borderRadius: 5,
-    },
-    text: {
-        height: 30,
     },
     checkbox: {
         padding: 10,
