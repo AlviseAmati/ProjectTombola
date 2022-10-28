@@ -71,7 +71,7 @@ export default class CreaPartita extends React.Component {
                 </View>
                 <Text style={styles.titleNick}>il numero e: {this.state.numero}</Text>
                 <Button color="red" title='Genera Numero' onPress={() => this.generaNumero()}></Button>
-                <BouncyCheckboxGroup style={{ flexDirection: 'row', justifyContent: 'center' }}
+                <BouncyCheckboxGroup style={{ marginBottom: '5%',marginTop: '5%',flexDirection: 'row', justifyContent: 'center' }}
                     data={verticalStaticData}
                     onChange={(selectedItem) => {
                         console.log("SelectedItem: ", JSON.stringify(selectedItem));
