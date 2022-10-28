@@ -93,7 +93,7 @@ const styles = StyleSheet.create({
 
     tablePartita: {
         backgroundColor: 'white',
-        width: '40%',
+        width: '80%',
         marginTop: '5%',
     },
 
