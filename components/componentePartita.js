@@ -24,16 +24,40 @@ export default class CreaPartita extends React.Component {
                 ['6', '', '25', '', '45', '55', '', '74', ''],
                 ['9', '19', '', '38', '', '', '69', '', '89']
 
-            ]
+            ],
+            numero: '',
         }
 
     }
-    generaNumero = () => {
-        this.setState({ partitaCreata: !this.state.partitaCreata })
+    generaNumero = (numero) => {
+        numero = Math.floor(Math.random() * 90) + 1;
+        this.setState({ numero: numero })
       }
 
     render() {
         const state = this.state;
+        const verticalStaticData = [
+            {
+              id: 0,
+              text: 'Ambo',
+            },
+            {
+              id: 1,
+              text: 'Terno',
+            },
+            {
+              id: 2,
+              text: 'Quaterna',
+            },
+            {
+              id: 3,
+              text: 'Cinquina',
+            },
+            {
+                id: 4,
+                text: 'Tombola!',
+              },
+          ];
         return (
 
             <View style={styles.containerPartita}>
@@ -41,13 +65,19 @@ export default class CreaPartita extends React.Component {
                     <Table style={styles.tablePartita} borderStyle={{ borderWidth: 2, borderColor: 'black' }}>
                         <Rows data={state.tableData1} style={styles.text} />
                     </Table>
-
                     <Table style={styles.tablePartita} borderStyle={{ borderWidth: 2, borderColor: 'black' }}>
                         <Rows data={state.tableData2} style={styles.text} />
                     </Table>
                 </View>
+                <Text style={styles.titleNick}>il numero e: {this.state.numero}</Text>
                 <Button color="red" title='Genera Numero' onPress={() => this.generaNumero()}></Button>
-                <Button color="red" title='Exit' onPress={() => this.props.navigation.navigate('Home')}></Button>
+                <BouncyCheckboxGroup style={{ flexDirection: 'row', justifyContent: 'center' }}
+                    data={verticalStaticData}
+                    onChange={(selectedItem) => {
+                        console.log("SelectedItem: ", JSON.stringify(selectedItem));
+                    }}
+                />
+                <Button  color="red" title='Exit' onPress={() => this.props.navigation.navigate('Home')}></Button>
             </View>
 
         );
