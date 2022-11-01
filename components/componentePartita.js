@@ -1,6 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import React from 'react';
-import { StyleSheet, Text, View, TextInput, Button, TouchableOpacity, Alert } from 'react-native';
+import { StyleSheet, Text, View, TextInput, Button, TouchableOpacity, Alert, TouchableHighlight } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/stack';
 import BouncyCheckbox from "react-native-bouncy-checkbox";
@@ -16,14 +16,7 @@ export default class CreaPartita extends React.Component {
             tableData1: [
                 ['', '', '21', '33', '', '52', '64', '', '84'],
                 ['6', '', '25', '', '45', '55', '', '74', ''],
-                ['9', '19', '', '38', '', '', '69', '', '89']
-
-            ],
-            tableData2: [
-                ['', '', '21', '33', '', '52', '64', '', '84'],
-                ['6', '', '25', '', '45', '55', '', '74', ''],
-                ['9', '19', '', '38', '', '', '69', '', '89']
-
+                ['9', '19', '', '38', '', '', '69', '', '89'],
             ],
             numero: '',
         }
@@ -33,8 +26,53 @@ export default class CreaPartita extends React.Component {
         numero = Math.floor(Math.random() * 90) + 1;
         this.setState({ numero: numero })
     }
-    _alertIndex(index) {
-        Alert.alert(`This is row ${index + 1}`);
+
+    _alertIndex(indexRow,indexCell) {
+        //Alert.alert(`This is row ${index + 1}`);
+        let newArr = [...this.state.tableData1]; // copying the old datas array
+        // a deep copy is not needed as we are overriding the whole object below, and not setting a property of it. this does not mutate the state. // 
+        if(newArr[indexRow][indexCell].includes("X")){
+            newArr[indexRow][indexCell] = newArr[indexRow][indexCell].replace("X","")
+        }else{
+            newArr[indexRow][indexCell] = newArr[indexRow][indexCell] + "X";
+        }
+        this.setState({tableData1: newArr})
+    }
+
+    renderRow(row,indexRow){
+        return(
+            <View style={{ flex: 1, alignSelf: 'stretch', flexDirection: 'row' }}>
+                {
+                    row.map((cell,indexCell) => {
+                        console.log(cell)
+                        return (
+                            this.renderCell(cell,indexRow,indexCell)
+                        )
+                    })
+                }
+            </View>
+        )
+    }
+
+    renderCell(cell,indexRow,indexCell){
+        console.log(cell)
+        return(
+            <View style={{ flex: 1, alignSelf: 'stretch', borderWidth: "2px", borderColor: "black", color: "black !important", backgroundColor: "#e28743" }}>
+                {
+                    cell != "" ? 
+                        cell.includes("X") ? 
+                            <TouchableHighlight onPress={() => {this._alertIndex(indexRow,indexCell)}}>
+                                <Text style={{color: "black !important", textAlign: "center", paddingBottom: "5px", paddingTop: "5px"}}>X</Text>
+                            </TouchableHighlight>
+                        : 
+                        <TouchableHighlight onPress={() => {this._alertIndex(indexRow,indexCell)}}>
+                            <Text style={{color: "black !important",textAlign: "center", paddingBottom: "5px", paddingTop: "5px"}}>{cell}</Text>
+                        </TouchableHighlight>
+                    :
+                    <TouchableHighlight><Text></Text></TouchableHighlight>
+                }
+            </View>
+        )
     }
 
     render() {
@@ -61,33 +99,18 @@ export default class CreaPartita extends React.Component {
                 text: 'Tombola!',
             },
         ];
-        const element = (data, index) => (
-            <TouchableOpacity onPress={() => this._alertIndex(index)}>
-                <View style={styles.btn}>
-                    <Text style={styles.btnText}>{data}</Text>
-                </View>
-            </TouchableOpacity>
-        );
+
         return (
 
             <View style={styles.containerPartita}>
                 <View style={{ flexDirection: 'column', alignItems: 'center' }}>
-                    <Table style={styles.tablePartita} borderStyle={{ borderWidth: 2, borderColor: 'black' }}>
-                        <Rows data={state.tableData1} style={styles.text} />
-                    </Table>
-                    <Table style={styles.tablePartita} borderStyle={{ borderWidth: 2, borderColor: 'black' }}>
-                        {
-                        state.tableData1.map((rowData, index) => (
-                            <TableWrapper key={index} style={styles.row}>
-                                {
-                                    rowData.map((cellData, cellIndex) => (
-                                        <Cell key={cellIndex} data={  element(cellData, index) } textStyle={styles.text} />
-                                    ))
-                                }
-                            </TableWrapper>
-                        ))}
-
-                    </Table>
+                    {
+                        this.state.tableData1.map((row,index) => {
+                            return (
+                                this.renderRow(row,index)
+                            )
+                        })
+                    }
                 </View>
                 <Text style={styles.titleNick}>il numero e: {this.state.numero}</Text>
                 <Button color="red" title='Genera Numero' onPress={() => this.generaNumero()}></Button>
