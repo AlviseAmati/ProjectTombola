@@ -15,7 +15,7 @@ export default class CreaPartita extends React.Component {
     constructor(props) { //per passare proprieta did ef acnhe il navigation
         super(props);
         this.state = {
-            tabelle: [this.generaCarta(),this.generaCarta(),this.generaCarta()],
+            tabelle: [this.generaCarta(),this.generaCarta()],
             numero: '',
         }
     }

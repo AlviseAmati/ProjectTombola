@@ -38,7 +38,7 @@ export default class Tabella extends React.Component {
                     cell != "" ? 
                         cell.includes("X") ? 
                             <TouchableHighlight style={{justifyContent: 'center', minHeight: 50}} onPress={() => {this._alertIndex(indexRow,indexCell)}}>
-                                <Text style={{color: "black !important", textAlign: "center", paddingBottom: 10, paddingTop: 5}}>X</Text>
+                                <Text style={{color: "black !important", textAlign: "center", paddingBottom: 10, paddingTop: 5, backgroundColor:'red'}}>{cell.replace('X',"")}</Text>
                             </TouchableHighlight>
                         : 
                         <TouchableHighlight style={{justifyContent: 'center', minHeight: 50}} onPress={() => {this._alertIndex(indexRow,indexCell)}}>
