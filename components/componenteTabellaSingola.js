@@ -33,12 +33,12 @@ export default class Tabella extends React.Component {
 
     renderCell(cell,indexRow,indexCell){
         return(
-            <View style={{ flex: 1, alignSelf: 'stretch', borderWidth: "2px", borderColor: "black", color: "black !important", backgroundColor: "#e28743" }}>
+            <View style={{ flex: 1, alignSelf: 'stretch', borderWidth: "1px", borderColor: "black", color: "black !important", backgroundColor: "#e28743" }}>
                 {
                     cell != "" ? 
                         cell.includes("X") ? 
                             <TouchableHighlight style={{justifyContent: 'center', minHeight: 50}} onPress={() => {this._alertIndex(indexRow,indexCell)}}>
-                                <Text style={{color: "black !important", textAlign: "center", paddingBottom: 10, paddingTop: 5, backgroundColor:'red'}}>{cell.replace('X',"")}</Text>
+                                <Text style={{color: "red !important",borderRadius:"15px", textAlign: "center",  backgroundColor:'red'}}>{cell.replace('X',"")}</Text>
                             </TouchableHighlight>
                         : 
                         <TouchableHighlight style={{justifyContent: 'center', minHeight: 50}} onPress={() => {this._alertIndex(indexRow,indexCell)}}>
@@ -62,6 +62,7 @@ export default class Tabella extends React.Component {
     }
 
     render(){
+        console.log(this.state.tabella)
         return (
             <View style={{ height: '20%', flexDirection: 'column', alignItems: 'center' }}>
                 {

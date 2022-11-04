@@ -1,34 +1,142 @@
 import { StatusBar } from 'expo-status-bar';
-import React from 'react';
-import { StyleSheet, Text, View, TextInput, Button } from 'react-native';
+import React, { useState,useEffect } from 'react';
+import { StyleSheet, Text, View, TextInput, Button, Pressable, Alert, TouchableHighlight } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/stack';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import socket from "../utils/socket"
 
 
 export default class Menu extends React.Component {
   constructor(props) { //per passare proprieta did ef acnhe il navigation
     super(props);
+    this.getData();
     this.state = {
-      value: '',
       usernameScelto: false,
       partitaCreata: false,
+      username: '',
+      stanze: null
     }
   }
+
+  componentDidMount(){
+		const fetchGroups = () => {
+			fetch("http://192.168.68.111:4000/api")
+				.then((res) => res.json())
+				.then((data) => {
+          console.log("Stanze")
+          console.log(data)
+          this.setState({stanze: data})
+        })
+				.catch((err) => console.error(err));
+		}
+		fetchGroups();
+
+    socket.on("roomsList",(rooms) => {
+      this.setState({stanze: rooms})
+      console.log("Nuove partite")
+      console.log(rooms)
+    })
+	}
+
+  // Funzione che viene fatta partire quando il componente viene chiamato
+
+  /*onSubmit = async () => {  //per salvare i dati persistenti
+    try {
+      this.setState({ token: 'abc123' })
+      AsyncStorage.setItem('username', this.state.username)
+      AsyncStorage.setItem('token', 'abc123')
+    }
+    catch (err) {
+      console.log(err)
+    }
+  }*/
+
+  getData = async () => { //per leggere i dati salvati
+    try {
+      const chiave = await AsyncStorage.getItem('token')
+      const username = await AsyncStorage.getItem('username');
+      if(chiave !== null){
+        this.setState({token: chiave})
+        //valore gia salvato in precedenza
+      }
+      if(username !== null){
+        this.setState({username})
+        //valore gia salvato in precedenza
+      }
+    } catch (e) {
+      Alert.alert("Error! While saving username");
+    }
+  }
+
+  removeValue = async () => {  //per eliminare i dati es se uno si slogga
+    try {
+      
+      AsyncStorage.removeItem('token', 'abc123')
+    }
+    catch (e) {
+      
+    }
+    console.log('rimosso dato')
+  }
+
+ /* storeUsername = async () => { 
+    try {
+      await AsyncStorage.setItem("username", username);
+      navigation.navigate("Chat");
+    } catch (e) {
+      Alert.alert("Error! While saving username");
+    }
+  }*/
+
+
   onChangeTextHandler = (text) => {
-    this.setState({ value: text })
+    this.setState({ username: text });
+    console.log(this.state.username)
   }
-  eseguiBottoneNick = () => {
-    this.setState({ usernameScelto: !this.state.usernameScelto })
+
+  eseguiBottoneNick = async() => {
+    try {
+      //METTERE VALUE UGUALE USERNAME
+      await AsyncStorage.setItem('username', this.state.username)
+    }
+    catch (err) {
+      console.log(err)
+    }
+    
+    this.setState({ usernameScelto: !this.state.usernameScelto });
+    if (this.state.username == null) {
+      Alert.alert("Username is required.");
+    } else {
+      //salvare nel server user
+    }
+
+    //socket.emit("newMessage", {});
   }
+
   eseguiBottonePartita = () => {
-    this.setState({ partitaCreata: !this.state.partitaCreata })
+    //this.setState({ partitaCreata: !this.state.partitaCreata })
+    socket.emit("createRoom","Stanza")
+    
   }
+
+  enterRoom = async(id) => {
+    socket.emit("enterRoom",{id: id, username: this.state.username})
+    socket.on("roomEntered",async (idRoom) => {
+      console.log("Accesso alla stanza completato")
+      console.log(idRoom)
+      await AsyncStorage.setItem("id",idRoom)
+      this.props.navigation.navigate("Partita")
+    })
+  }
+
   render() {
+
     if (this.state.usernameScelto == false) {
       return (
         <View style={styles.containerHome}>
           <Text style={styles.titleHome}>TOMBOLA</Text>
-          <TextInput value={this.state.value} style={styles.inputNickname} placeholder="scegli nickname" onChangeText={this.onChangeTextHandler}></TextInput>
+          <TextInput username={this.state.username} style={styles.inputNickname} placeholder="scegli nickname" onChangeText={this.onChangeTextHandler}></TextInput>
           <Button color="red" title='Gioca!' onPress={() => this.eseguiBottoneNick()}></Button>
           <StatusBar style="auto" />
         </View>
@@ -37,33 +145,28 @@ export default class Menu extends React.Component {
     else if (this.state.partitaCreata == false) {
       return (
         <View style={styles.containerHome}>
-          <Text style={styles.titleNick}>il tuo username e: {this.state.value}</Text>
+          <Text style={styles.titleNick}>il tuo username e: {this.state.username}</Text>
           <View style={{ position: 'absolute',/*flexDirection: 'row',*/ top: '20%', }}>
             <Button color="red" title='Crea Partita' onPress={() => this.eseguiBottonePartita()}></Button>
           </View>
-          <Text style={styles.titleLista}>lista partite attive</Text>
-          <Text style={styles.titleLista}>lista partite attive</Text>
-          <Text style={styles.titleLista}>lista partite attive</Text>
+          {
+            this.state.stanze != null ? 
+              this.state.stanze.map((stanza) => {
+                return (
+                  <TouchableHighlight onPress={() => this.enterRoom(stanza.id)}>
+                    <View>
+                      <Text>{stanza.name}-{stanza.id}</Text>
+                    </View>
+                  </TouchableHighlight>
+                )
+              })
+            : console.log("Caricamento in corso")
+          }
           <Button color="red" title='Indietro' onPress={() => this.eseguiBottoneNick()}></Button>
         </View>
       );
-    }
-    else {
-      return (
-
-        <View style={styles.containerHome}>
-          <Text style={styles.titleHome}>Creazione Partita</Text>
-
-          <View style={{   }}>
-            <TextInput value={this.state.value} style={styles.inputNickname} placeholder="Nome Partita Automatico" onChangeText={this.onChangeTextHandler}></TextInput>
-          </View>
-
-          <Button color="red" title='Crea' onPress={() => this.props.navigation.navigate('CreaPartita')}></Button>
-          <Button color="red" title='Indietro' onPress={() => this.eseguiBottoneNick()}></Button>
-          <StatusBar style="auto" />
-        </View>
-
-      );
+    }else{
+      <></>
     }
   }
 }

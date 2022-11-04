@@ -16,8 +16,7 @@ export default function App() {
       <NavigationContainer>
          <Stack.Navigator>
             <Stack.Screen /*options={{ headerShown: false }}*/ name="Home" component={Menu} />
-            <Stack.Screen /*options={{ headerShown: false }}*/ name="CreaPartita" component={CreaPartita} />
-            <Stack.Screen /*options={{ headerShown: false }}*/ name="SceltaCartelle" component={SceltaCartelle} />
+            <Stack.Screen /*options={{ headerShown: false }}*/ name="Partita" component={CreaPartita} />
             
          </Stack.Navigator>
       </NavigationContainer>

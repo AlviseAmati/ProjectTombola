@@ -1,154 +1,77 @@
-import { StatusBar } from 'expo-status-bar';
-import React from 'react';
-import { StyleSheet, Text, View, TextInput, Button, TouchableOpacity, Alert } from 'react-native';
-import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/stack';
-import BouncyCheckbox from "react-native-bouncy-checkbox";
-import BouncyCheckboxGroup from "react-native-bouncy-checkbox-group";
-import ICheckboxButton from "react-native-bouncy-checkbox-group";
-import { Table, TableWrapper, Row, Rows, Col, Cols, Cell } from 'react-native-table-component';
+import React, { useState, useLayoutEffect } from "react";
+import {
+	Text,
+	SafeAreaView,
+	View,
+	TextInput,
+	Pressable,
+	Alert,
+} from "react-native";
+import { styles } from "../utils/styles";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-export default class CreaPartita extends React.Component {
-    constructor(props) { //per passare proprieta did ef acnhe il navigation ....
-        super(props);
-        this.state = {
+const Login = ({ navigation }) => {
+	const [username, setUsername] = useState("");
 
-            tableData1: [
-                ['', '', '21', '33', '', '52', '64', '', '84'],
-                ['6', '', '25', '', '45', '55', '', '74', ''],
-                ['9', '19', '', '38', '', '', '69', '', '89']
+	const storeUsername = async () => {
+		try {
+			await AsyncStorage.setItem("username", username);
+			navigation.navigate("Chat");
+		} catch (e) {
+			Alert.alert("Error! While saving username");
+		}
+	};
 
-            ],
-            tableData2: [
-                ['', '', '21', '33', '', '52', '64', '', '84'],
-                ['6', '', '25', '', '45', '55', '', '74', ''],
-                ['9', '19', '', '38', '', '', '69', '', '89']
+	const handleSignIn = () => {
+		if (username.trim()) {
+			storeUsername();
+		} else {
+			Alert.alert("Username is required.");
+		}
+	};
 
-            ],
-            numero: '',
-        }
+	useLayoutEffect(() => {
+		const getUsername = async () => {
+			try {
+				const value = await AsyncStorage.getItem("username");
+				if (value !== null) {
+					 return (
+        <View style={styles.containerHome}>
+          <Text style={styles.titleHome}>TOMBOLA</Text>
+          <TextInput value={this.state.value} style={styles.inputNickname} placeholder="scegli nickname" onChangeText={this.onChangeTextHandler}></TextInput>
+          <Button color="red" title='Gioca!' onPress={() => this.eseguiBottoneNick()}></Button>
+          <StatusBar style="auto" />
+        </View>
+      );
+				}
+			} catch (e) {
+				console.error("Error while loading username!");
+			}
+		};
+		getUsername();
+	}, []);
 
-    }
-    generaNumero = (numero) => {
-        numero = Math.floor(Math.random() * 90) + 1;
-        this.setState({ numero: numero })
-    }
-    _alertIndex(index) {
-        Alert.alert(`This is row ${index + 1}`);
-    }
+	return (
+		<SafeAreaView style={styles.loginscreen}>
+			<View style={styles.loginscreen}>
+				<Text style={styles.loginheading}>Sign in</Text>
+				<View style={styles.logininputContainer}>
+					<TextInput
+						autoCorrect={false}
+						placeholder='Enter your username'
+						style={styles.logininput}
+						onChangeText={(value) => setUsername(value)}
+					/>
+				</View>
 
-    render() {
-        const state = this.state;
-        const verticalStaticData = [
-            {
-                id: 0,
-                text: 'Ambo',
-            },
-            {
-                id: 1,
-                text: 'Terno',
-            },
-            {
-                id: 2,
-                text: 'Quaterna',
-            },
-            {
-                id: 3,
-                text: 'Cinquina',
-            },
-            {
-                id: 4,
-                text: 'Tombola!',
-            },
-        ];
-        const element = (data, index) => (
-            <TouchableOpacity onPress={() => this._alertIndex(index)}>
-                <View style={styles.btn}>
-                    <Text style={styles.btnText}>{data}</Text>
-                </View>
-            </TouchableOpacity>
-        );
-        return (
+				<Pressable onPress={handleSignIn} style={styles.loginbutton}>
+					<View>
+						<Text style={styles.loginbuttonText}>Get Started</Text>
+					</View>
+				</Pressable>
+			</View>
+		</SafeAreaView>
+	);
+};
 
-            <View style={styles.containerPartita}>
-                <View style={{ flexDirection: 'column', alignItems: 'center' }}>
-                    <Table style={styles.tablePartita} borderStyle={{ borderWidth: 2, borderColor: 'black' }}>
-                        <Rows data={state.tableData1} style={styles.text} />
-                    </Table>
-                    <Table style={styles.tablePartita} borderStyle={{ borderWidth: 2, borderColor: 'black' }}>
-                        {
-                        state.tableData1.map((rowData, index) => (
-                            <TableWrapper key={index} style={styles.row}>
-                                {
-                                    rowData.map((cellData, cellIndex) => (
-                                        <Cell key={cellIndex} data={  element(cellData, index) } textStyle={styles.text} />
-                                    ))
-                                }
-                            </TableWrapper>
-                        ))}
-
-                    </Table>
-                </View>
-                <Text style={styles.titleNick}>il numero e: {this.state.numero}</Text>
-                <Button color="red" title='Genera Numero' onPress={() => this.generaNumero()}></Button>
-                <BouncyCheckboxGroup style={{ color: 'red', marginBottom: '5%', marginTop: '5%', flexDirection: 'row', justifyContent: 'center' }}
-                    data={verticalStaticData}
-                    onChange={(selectedItem) => {
-                        console.log("SelectedItem: ", JSON.stringify(selectedItem));
-                    }}
-                />
-                <Button color="red" title='Exit' onPress={() => this.props.navigation.navigate('Home')}></Button>
-            </View>
-
-        );
-    }
-}
-
-
-const styles = StyleSheet.create({
-
-    containerPartita: { flex: 1, padding: 16, paddingTop: 30, backgroundColor: 'yellow' },
-    head: { height: 40, backgroundColor: '#f1f8ff' },
-    text: { margin: 2, alignItems: 'center' },
-    row: { flexDirection: 'row', backgroundColor: 'white' },
-
-    tablePartita: {
-        backgroundColor: 'white',
-        width: '80%',
-        marginTop: '5%',
-    },
-
-    containerHome: {
-        flex: 1,
-        backgroundColor: 'yellow',
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    titleHome: {
-        position: 'absolute',
-        color: 'red',
-        fontSize: '40%',
-        top: '5%',
-        fontWeight: 'bold',
-        alignItems: 'center',
-
-    },
-    titleLista: {
-        color: 'black',
-        fontSize: '20%',
-    },
-    inputNickname: {
-        height: 30,
-        margin: '1%',
-        borderWidth: 1,
-        padding: 5,
-        width: 150,
-        backgroundColor: 'white',
-        borderRadius: 5,
-    },
-    checkbox: {
-        padding: 10,
-    },
-
-    /*style={{padding: 50}}*/
-});
+export default Login;

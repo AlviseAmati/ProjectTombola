@@ -8,15 +8,19 @@ import BouncyCheckboxGroup from "react-native-bouncy-checkbox-group";
 import ICheckboxButton from "react-native-bouncy-checkbox-group";
 import { Table, TableWrapper, Row, Rows, Col, Cols, Cell } from 'react-native-table-component';
 import Tabella from "./componenteTabellaSingola"
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import socket from '../utils/socket';
 
 var RandTools = require('./rand_tools.js');
 
 export default class CreaPartita extends React.Component {
     constructor(props) { //per passare proprieta did ef acnhe il navigation
         super(props);
+        
         this.state = {
             tabelle: [this.generaCarta(),this.generaCarta()],
             numero: '',
+            listaGiocatori: []
         }
     }
 
@@ -25,8 +29,27 @@ export default class CreaPartita extends React.Component {
         this.setState({ numero: numero })
     }
 
+    async componentDidMount(){
+        console.log(await AsyncStorage.getItem("username"))
+        var id = await AsyncStorage.getItem("id")
+        this.props.navigation.setOptions({ title: 'Stanza-' + id })
+        console.log(id)
+
+        /*socket.emit("gameStart",id)
+        socket.on("numeroEstratto",(numeroEstratto) => {
+            this.setState({numero: numeroEstratto})
+        })*/
+
+        socket.on("utenteCollegato",(name) => {
+            //this.setState({numero: numeroEstratto})
+            var newArray = this.state.listaGiocatori
+            newArray.push(name)
+            this.setState({listaGiocatori: newArray})
+        })
+    }
+
     generaCarta = () => {
-       
+        //console.log(await AsyncStorage.getItem("username"))
         const tools = new RandTools(); 
         const extract_pool = [];
         var card = [[], [], []];
@@ -95,6 +118,15 @@ export default class CreaPartita extends React.Component {
         return (
 
             <View style={styles.containerPartita}>
+                <View>
+                    {
+                        this.state.listaGiocatori.map((nome) => {
+                            return (
+                                <Text>{nome}</Text>
+                            )
+                        })
+                    }
+                </View>
                 {
                     this.state.tabelle.map((tabella) => {
                         return (
@@ -106,7 +138,6 @@ export default class CreaPartita extends React.Component {
                     })
                 }
                 <Text style={styles.titleNick}>il numero e: {this.state.numero}</Text>
-                <Button color="red" title='Genera Numero' onPress={() => this.generaNumero()}></Button>
                 <BouncyCheckboxGroup style={{ color: 'red', marginBottom: '5%', marginTop: '5%', flexDirection: 'row', justifyContent: 'center' }}
                     data={verticalStaticData}
                     onChange={(selectedItem) => {
