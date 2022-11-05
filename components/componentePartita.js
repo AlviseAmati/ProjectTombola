@@ -25,6 +25,7 @@ export default class CreaPartita extends React.Component {
         this.state = {
             tabelle: [this.generaCarta(), this.generaCarta()],
             numero: '',
+            listaNumeri: [],
             listaGiocatori: [],
             index: 0,
             statoBottoneTerno: false,
@@ -50,10 +51,11 @@ export default class CreaPartita extends React.Component {
         this.props.navigation.setOptions({ title: 'Stanza-' + id })
         console.log(id)
 
-        /*socket.emit("gameStart",id)
+        socket.emit("gameStart",id)
         socket.on("numeroEstratto",(numeroEstratto) => {
             this.setState({numero: numeroEstratto})
-        })*/
+           // this.setState({listaNumeri: numeroEstratto})
+        })
 
         socket.on("utenteCollegato", (name) => {
             //this.setState({numero: numeroEstratto})
@@ -173,7 +175,9 @@ export default class CreaPartita extends React.Component {
             </View>
         );
         const SecondRoute = () => (
-            <View style={[styles.scene, { backgroundColor: 'yellow' }]} />
+            <View style={[styles.scene, { backgroundColor: 'yellow' }]} >
+                <Text style={styles.titleNick}>il numero e: {this.state.listaNumeri}</Text>
+            </View>
         );
 
         const renderTabBar = (props) => (
