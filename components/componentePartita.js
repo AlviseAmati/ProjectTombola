@@ -1,6 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
-import React from 'react';
-import { StyleSheet, Text, View, TextInput, Button, TouchableOpacity, Alert, TouchableHighlight } from 'react-native';
+import * as React from 'react';
+import { StyleSheet, Text, View, TextInput, Button, TouchableOpacity, Alert, TouchableHighlight, useWindowDimensions, Dimensions, TouchableHighlightBase } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/stack';
 import BouncyCheckbox from "react-native-bouncy-checkbox";
@@ -10,26 +10,41 @@ import { Table, TableWrapper, Row, Rows, Col, Cols, Cell } from 'react-native-ta
 import Tabella from "./componenteTabellaSingola"
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import socket from '../utils/socket';
+import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
+
+const initialLayout = { with: Dimensions.get('window').width };
 
 var RandTools = require('./rand_tools.js');
+
+
 
 export default class CreaPartita extends React.Component {
     constructor(props) { //per passare proprieta did ef acnhe il navigation
         super(props);
-        
+
         this.state = {
-            tabelle: [this.generaCarta(),this.generaCarta()],
+            tabelle: [this.generaCarta(), this.generaCarta()],
             numero: '',
-            listaGiocatori: []
+            listaGiocatori: [],
+            index: 0,
+            statoBottoneTerno: false,
+            statoBottoneCinquina: false,
+            statoBottoneTombola: false,
+            routes: [
+                { key: 'first', title: 'Gioco' },
+                { key: 'second', title: 'Tabellone' },
+            ]
         }
     }
+
+
 
     generaNumero = (numero) => {
         numero = Math.floor(Math.random() * 90) + 1;
         this.setState({ numero: numero })
     }
 
-    async componentDidMount(){
+    async componentDidMount() {
         console.log(await AsyncStorage.getItem("username"))
         var id = await AsyncStorage.getItem("id")
         this.props.navigation.setOptions({ title: 'Stanza-' + id })
@@ -40,17 +55,17 @@ export default class CreaPartita extends React.Component {
             this.setState({numero: numeroEstratto})
         })*/
 
-        socket.on("utenteCollegato",(name) => {
+        socket.on("utenteCollegato", (name) => {
             //this.setState({numero: numeroEstratto})
             var newArray = this.state.listaGiocatori
             newArray.push(name)
-            this.setState({listaGiocatori: newArray})
+            this.setState({ listaGiocatori: newArray })
         })
     }
 
     generaCarta = () => {
         //console.log(await AsyncStorage.getItem("username"))
-        const tools = new RandTools(); 
+        const tools = new RandTools();
         const extract_pool = [];
         var card = [[], [], []];
 
@@ -82,17 +97,28 @@ export default class CreaPartita extends React.Component {
             }
         }
 
-        for(var i = 0; i < card.length; i++){
-            for(var j = 0; j < card[0].length; j++){ 
+        for (var i = 0; i < card.length; i++) {
+            for (var j = 0; j < card[0].length; j++) {
                 card[i][j] = card[i][j].toString()
             }
         }
         return card;
     }
 
+    disabilitaBottoneTerno = () => {
+        this.setState({ statoBottoneTerno: !this.state.statoBottoneTerno });
+    }
+    disabilitaBottoneCinquina = () => {
+        this.setState({ statoBottoneCinquina: !this.state.statoBottoneCinquina });
+    }
+    disabilitaBottoneTombola = () => {
+        this.setState({ statoBottoneTombola: !this.state.statoBottoneTombola });
+    }
+
+
     render() {
         const state = this.state;
-        const verticalStaticData = [
+        /*const verticalStaticData = [ //per checkbox
             {
                 id: 0,
                 text: 'Ambo',
@@ -113,16 +139,15 @@ export default class CreaPartita extends React.Component {
                 id: 4,
                 text: 'Tombola!',
             },
-        ];
+        ];*/
 
-        return (
-
-            <View style={styles.containerPartita}>
+        const FirstRoute = () => (
+            <View style={[styles.containerPartita]}>
                 <View>
                     {
                         this.state.listaGiocatori.map((nome) => {
                             return (
-                                <Text>{nome}</Text>
+                                <Text style={{marginBottom: '5%'}}>Giocatori collegati:{nome}</Text>
                             )
                         })
                     }
@@ -132,20 +157,44 @@ export default class CreaPartita extends React.Component {
                         return (
                             <>
                                 <Tabella tabella={tabella} />
-                                <View  style={{height: 25}}/>
+                                <View style={{ height: 25 }} />
                             </>
                         )
                     })
                 }
                 <Text style={styles.titleNick}>il numero e: {this.state.numero}</Text>
-                <BouncyCheckboxGroup style={{ color: 'red', marginBottom: '5%', marginTop: '5%', flexDirection: 'row', justifyContent: 'center' }}
-                    data={verticalStaticData}
-                    onChange={(selectedItem) => {
-                        console.log("SelectedItem: ", JSON.stringify(selectedItem));
-                    }}
-                />
+                <View style={styles.viewBottoniPunteggi}>
+                    <Button color="red" title="Terno" disabled={this.state.statoBottoneTerno} onPress={() => this.disabilitaBottoneTerno()} />
+                    <Button color="red" title="Cinquina" disabled={this.state.statoBottoneCinquina} onPress={() => this.disabilitaBottoneCinquina()} />
+                    <Button color="red" title="Tombola!" disabled={this.state.statoBottoneTombola} onPress={() => this.disabilitaBottoneTombola()} />
+                </View>
+
                 <Button color="red" title='Exit' onPress={() => this.props.navigation.navigate('Home')}></Button>
             </View>
+        );
+        const SecondRoute = () => (
+            <View style={[styles.scene, { backgroundColor: 'yellow' }]} />
+        );
+
+        const renderTabBar = (props) => (
+            <TabBar
+                {...props}
+                style={{ backgroundColor: "red" }}
+            />
+        );
+
+        return (
+            <TabView
+                navigationState={this.state}
+                renderScene={SceneMap({
+                    first: FirstRoute,
+                    second: SecondRoute,
+                })}
+                onIndexChange={index => this.setState({ index })}
+                initialLayout={{ width: Dimensions.get('window').width }}
+                renderTabBar={renderTabBar}
+
+            />
 
         );
     }
@@ -158,6 +207,16 @@ const styles = StyleSheet.create({
     head: { height: 40, backgroundColor: '#f1f8ff' },
     text: { margin: 2, alignItems: 'center' },
     row: { flexDirection: 'row', backgroundColor: 'white' },
+
+    scene: {
+        flex: 1,
+    },
+    viewBottoniPunteggi: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginBottom: '30%',
+        marginTop: '10%'
+      },
 
     tablePartita: {
         backgroundColor: 'white',
