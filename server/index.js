@@ -52,7 +52,7 @@ socketIO.on("connection", (socket) => {
         console.log(id)
 		let result = chatRooms.filter((room) => room.id == id);
         console.log(result)
-        setInterval(() => {estraiNumero(socket,result[0].numeriDaEstrarre, result[0].numeriEstratti,result[0].id)}, 5000)
+        setInterval(() => {estraiNumero(socket,result[0].numeriDaEstrarre, result[0].numeriEstratti,result[0].id)}, 10000)
     })
 });
 

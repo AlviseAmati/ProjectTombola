@@ -134,7 +134,7 @@ export default class Menu extends React.Component {
 
     if (this.state.usernameScelto == false) {
       return (
-        <View style={styles.containerHome}>
+        <View style={styles.containerHome} >
           <Text style={styles.titleHome}>TOMBOLA</Text>
           <TextInput username={this.state.username} style={styles.inputNickname} placeholder="scegli nickname" onChangeText={this.onChangeTextHandler}></TextInput>
           <Button color="red" title='Gioca!' onPress={() => this.eseguiBottoneNick()}></Button>

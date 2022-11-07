@@ -38,14 +38,18 @@ export default class CreaPartita extends React.Component {
         }
     }
 
-
+    async prelevaNickname(){ //far partire questa funzione a onLOAD pagina
+        var username = await AsyncStorage.getItem('username');
+        this.setState({ listaGiocatori: username })
+    }
+    
 
     generaNumero = (numero) => {
         numero = Math.floor(Math.random() * 90) + 1;
         this.setState({ numero: numero })
     }
 
-    async componentDidMount() {
+    async componentDidMount() { //parte all' onLoad
         console.log(await AsyncStorage.getItem("username"))
         var id = await AsyncStorage.getItem("id")
         this.props.navigation.setOptions({ title: 'Stanza-' + id })
@@ -53,8 +57,10 @@ export default class CreaPartita extends React.Component {
 
         socket.emit("gameStart",id)
         socket.on("numeroEstratto",(numeroEstratto) => {
+            var arrayNumeri = this.state.listaNumeri //creo array per fare il tabellone
+            arrayNumeri.push(numeroEstratto)
             this.setState({numero: numeroEstratto})
-           // this.setState({listaNumeri: numeroEstratto})
+            this.setState({listaNumeri: arrayNumeri})
         })
 
         socket.on("utenteCollegato", (name) => {
@@ -142,7 +148,7 @@ export default class CreaPartita extends React.Component {
                 text: 'Tombola!',
             },
         ];*/
-
+       
         const FirstRoute = () => (
             <View style={[styles.containerPartita]}>
                 <View>
@@ -176,7 +182,7 @@ export default class CreaPartita extends React.Component {
         );
         const SecondRoute = () => (
             <View style={[styles.scene, { backgroundColor: 'yellow' }]} >
-                <Text style={styles.titleNick}>il numero e: {this.state.listaNumeri}</Text>
+                <Text style={styles.titleNick}>il numero e: {this.state.listaNumeri.join(", ")}</Text>
             </View>
         );
 
