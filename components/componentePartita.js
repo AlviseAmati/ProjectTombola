@@ -31,6 +31,7 @@ export default class CreaPartita extends React.Component {
             statoBottoneTerno: false,
             statoBottoneCinquina: false,
             statoBottoneTombola: false,
+            statoPartitaFinita: false,
             routes: [
                 { key: 'first', title: 'Gioco' },
                 { key: 'second', title: 'Tabellone' },
@@ -38,11 +39,11 @@ export default class CreaPartita extends React.Component {
         }
     }
 
-    async prelevaNickname(){ //far partire questa funzione a onLOAD pagina
+    async prelevaNickname() { //far partire questa funzione a onLOAD pagina
         var username = await AsyncStorage.getItem('username');
         this.setState({ listaGiocatori: username })
     }
-    
+
 
     generaNumero = (numero) => {
         numero = Math.floor(Math.random() * 90) + 1;
@@ -55,12 +56,12 @@ export default class CreaPartita extends React.Component {
         this.props.navigation.setOptions({ title: 'Stanza-' + id })
         console.log(id)
 
-        socket.emit("gameStart",id)
-        socket.on("numeroEstratto",(numeroEstratto) => {
+        socket.emit("gameStart", id)
+        socket.on("numeroEstratto", (numeroEstratto) => {
             var arrayNumeri = this.state.listaNumeri //creo array per fare il tabellone
             arrayNumeri.push(numeroEstratto)
-            this.setState({numero: numeroEstratto})
-            this.setState({listaNumeri: arrayNumeri})
+            this.setState({ numero: numeroEstratto })
+            this.setState({ listaNumeri: arrayNumeri })
         })
 
         socket.on("utenteCollegato", (name) => {
@@ -122,7 +123,11 @@ export default class CreaPartita extends React.Component {
     disabilitaBottoneTombola = () => {
         this.setState({ statoBottoneTombola: !this.state.statoBottoneTombola });
     }
-
+    cambiaViewPunteggio = () => {
+        var variabile = true;
+        this.setState({ statoPartitaFinita: variabile });
+        
+    }
 
     render() {
         const state = this.state;
@@ -148,14 +153,14 @@ export default class CreaPartita extends React.Component {
                 text: 'Tombola!',
             },
         ];*/
-       
+
         const FirstRoute = () => (
             <View style={[styles.containerPartita]}>
                 <View>
                     {
                         this.state.listaGiocatori.map((nome) => {
                             return (
-                                <Text style={{marginBottom: '5%'}}>Giocatori collegati:{nome}</Text>
+                                <Text style={{ marginBottom: '5%' }}>Giocatori collegati:{nome}</Text>
                             )
                         })
                     }
@@ -170,14 +175,14 @@ export default class CreaPartita extends React.Component {
                         )
                     })
                 }
-                <Text style={styles.titleNick}>il numero e: {this.state.numero}</Text>
+                <Text style={styles.titleNick}>il numero e: <Text style={styles.numero}>{this.state.numero}</Text></Text>
                 <View style={styles.viewBottoniPunteggi}>
                     <Button color="red" title="Terno" disabled={this.state.statoBottoneTerno} onPress={() => this.disabilitaBottoneTerno()} />
                     <Button color="red" title="Cinquina" disabled={this.state.statoBottoneCinquina} onPress={() => this.disabilitaBottoneCinquina()} />
                     <Button color="red" title="Tombola!" disabled={this.state.statoBottoneTombola} onPress={() => this.disabilitaBottoneTombola()} />
                 </View>
 
-                <Button color="red" title='Exit' onPress={() => this.props.navigation.navigate('Home')}></Button>
+                <Button color="red" title='Exit Prova' onPress={() => this.cambiaViewPunteggio()}></Button>
             </View>
         );
         const SecondRoute = () => (
@@ -192,21 +197,32 @@ export default class CreaPartita extends React.Component {
                 style={{ backgroundColor: "red" }}
             />
         );
+        if (this.state.statoPartitaFinita == false) {
+            return (
+                <TabView
+                    navigationState={this.state}
+                    renderScene={SceneMap({
+                        first: FirstRoute,
+                        second: SecondRoute,
+                    })}
+                    onIndexChange={index => this.setState({ index })}
+                    initialLayout={{ width: Dimensions.get('window').width }}
+                    renderTabBar={renderTabBar}
 
-        return (
-            <TabView
-                navigationState={this.state}
-                renderScene={SceneMap({
-                    first: FirstRoute,
-                    second: SecondRoute,
-                })}
-                onIndexChange={index => this.setState({ index })}
-                initialLayout={{ width: Dimensions.get('window').width }}
-                renderTabBar={renderTabBar}
+                />
 
-            />
-
-        );
+            );
+        }
+        else { //view fine partita
+            return (
+                <View style={styles.containerHome} >
+                    <Text style={styles.titleHome}>PUNTEGGIO:</Text>
+                    <Text style={styles.titleNick}>il vincitore e: </Text>
+                    <Button color="red" title='Exit' onPress={() => this.props.navigation.navigate('Home')}></Button>
+                    <StatusBar style="auto" />
+                </View>
+            );
+        }
     }
 }
 
@@ -221,12 +237,18 @@ const styles = StyleSheet.create({
     scene: {
         flex: 1,
     },
+
+    numero: {
+        fontSize: '20%',
+        fontWeight: 'bold'
+    },
+
     viewBottoniPunteggi: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         marginBottom: '30%',
         marginTop: '10%'
-      },
+    },
 
     tablePartita: {
         backgroundColor: 'white',
