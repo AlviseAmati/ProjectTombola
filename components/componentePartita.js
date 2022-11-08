@@ -1,5 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
-import * as React from 'react';
+import React from 'react';
 import { StyleSheet, Text, View, TextInput, Button, TouchableOpacity, Alert, TouchableHighlight, useWindowDimensions, Dimensions, TouchableHighlightBase } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/stack';
@@ -26,6 +26,7 @@ export default class CreaPartita extends React.Component {
             tabelle: [this.generaCarta(), this.generaCarta()],
             numero: '',
             listaNumeri: [],
+            tabellone: this.createTabellone(),
             listaGiocatori: [],
             index: 0,
             statoBottoneTerno: false,
@@ -39,18 +40,48 @@ export default class CreaPartita extends React.Component {
         }
     }
 
+    createTabellone = () => {
+        var arr = []
+        for(var i = 0 ; i < 9; i++){
+            var arr1 = []
+            for(var j = 1; j <= 10; j++){
+                if(j != 0){
+                    arr1.push(parseInt(i * 10 + j).toString())
+                }
+            }
+            arr.push(arr1)
+        }
+        console.log(arr)
+        return arr
+    }
+
     async prelevaNickname() { //far partire questa funzione a onLOAD pagina
         var username = await AsyncStorage.getItem('username');
         this.setState({ listaGiocatori: username })
     }
-
 
     generaNumero = (numero) => {
         numero = Math.floor(Math.random() * 90) + 1;
         this.setState({ numero: numero })
     }
 
+    updateTabellone(numeroEstratto){
+        var tabelloneNew = this.state.tabellone
+        for(var i = 0; i < tabelloneNew.length; i++){
+            for(var j = 0; j <= tabelloneNew[i].length; j++){
+                if(tabelloneNew[i][j] == numeroEstratto.toString()){
+                    tabelloneNew[i][j] = tabelloneNew[i][j] + "X"
+                }
+            }
+            /*if(i == numeroEstratto){
+                tabelloneNew[i] = tabelloneNew[i] + "X"
+            }*/
+        }
+        return tabelloneNew
+    }
+
     async componentDidMount() { //parte all' onLoad
+        console.log("COMPONENT DID MOUNT")
         console.log(await AsyncStorage.getItem("username"))
         var id = await AsyncStorage.getItem("id")
         this.props.navigation.setOptions({ title: 'Stanza-' + id })
@@ -60,14 +91,17 @@ export default class CreaPartita extends React.Component {
         socket.on("numeroEstratto", (numeroEstratto) => {
             var arrayNumeri = this.state.listaNumeri //creo array per fare il tabellone
             arrayNumeri.push(numeroEstratto)
+            var newTabellone = this.updateTabellone(numeroEstratto)
+            this.setState({ tabellone: newTabellone})
             this.setState({ numero: numeroEstratto })
             this.setState({ listaNumeri: arrayNumeri })
         })
 
-        socket.on("utenteCollegato", (name) => {
+        socket.on("listaUtenti", (players) => {
             //this.setState({numero: numeroEstratto})
-            var newArray = this.state.listaGiocatori
-            newArray.push(name)
+            console.log("Nuovi players")
+            console.log(players)
+            var newArray = players
             this.setState({ listaGiocatori: newArray })
         })
     }
@@ -131,28 +165,6 @@ export default class CreaPartita extends React.Component {
 
     render() {
         const state = this.state;
-        /*const verticalStaticData = [ //per checkbox
-            {
-                id: 0,
-                text: 'Ambo',
-            },
-            {
-                id: 1,
-                text: 'Terno',
-            },
-            {
-                id: 2,
-                text: 'Quaterna',
-            },
-            {
-                id: 3,
-                text: 'Cinquina',
-            },
-            {
-                id: 4,
-                text: 'Tombola!',
-            },
-        ];*/
 
         const FirstRoute = () => (
             <View style={[styles.containerPartita]}>
@@ -160,7 +172,7 @@ export default class CreaPartita extends React.Component {
                     {
                         this.state.listaGiocatori.map((nome) => {
                             return (
-                                <Text style={{ marginBottom: '5%' }}>Giocatori collegati:{nome}</Text>
+                                <Text style={{ marginBottom: '5%' }}>{nome}</Text>
                             )
                         })
                     }
@@ -185,11 +197,20 @@ export default class CreaPartita extends React.Component {
                 <Button color="red" title='Exit Prova' onPress={() => this.cambiaViewPunteggio()}></Button>
             </View>
         );
-        const SecondRoute = () => (
+        /*const SecondRoute = () => (
             <View style={[styles.scene, { backgroundColor: 'yellow' }]} >
                 <Text style={styles.titleNick}>il numero e: {this.state.listaNumeri.join(", ")}</Text>
             </View>
-        );
+        );*/
+
+        const SecondRoute = () => {
+            return (
+                <>
+                    <Tabella tabella={this.state.tabellone} />
+                    <View style={{ height: 25 }} />
+                </>
+            )
+        }
 
         const renderTabBar = (props) => (
             <TabBar
@@ -239,7 +260,7 @@ const styles = StyleSheet.create({
     },
 
     numero: {
-        fontSize: '20%',
+        //fontSize: '20%',
         fontWeight: 'bold'
     },
 

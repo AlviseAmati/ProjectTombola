@@ -10,6 +10,8 @@ import socket from "../utils/socket"
 export default class Menu extends React.Component {
   constructor(props) { //per passare proprieta did ef acnhe il navigation
     super(props);
+    console.log("MENU init")
+    console.log(props)
     this.getData();
     this.state = {
       usernameScelto: false,
@@ -18,10 +20,22 @@ export default class Menu extends React.Component {
       stanze: null
     }
   }
+  
+  componentWillUnmount(){
+
+  }
 
   componentDidMount(){
-		const fetchGroups = () => {
-			fetch("http://192.168.68.111:4000/api")
+    socket.on("roomsList",(rooms) => {
+      this.setState({stanze: rooms})
+      console.log("Nuove partite")
+      console.log(rooms)
+    })
+	}
+
+  makeRequest = () => {
+    const fetchGroups = () => {
+			fetch("http://192.168.0.107/api")
 				.then((res) => res.json())
 				.then((data) => {
           console.log("Stanze")
@@ -31,13 +45,7 @@ export default class Menu extends React.Component {
 				.catch((err) => console.error(err));
 		}
 		fetchGroups();
-
-    socket.on("roomsList",(rooms) => {
-      this.setState({stanze: rooms})
-      console.log("Nuove partite")
-      console.log(rooms)
-    })
-	}
+  }
 
   // Funzione che viene fatta partire quando il componente viene chiamato
 
@@ -111,6 +119,8 @@ export default class Menu extends React.Component {
       //salvare nel server user
     }
 
+    setInterval(this.makeRequest, 5000)
+
     //socket.emit("newMessage", {});
   }
 
@@ -131,7 +141,7 @@ export default class Menu extends React.Component {
   }
 
   render() {
-
+    console.log("RENDER HOME")
     if (this.state.usernameScelto == false) {
       return (
         <View style={styles.containerHome} >

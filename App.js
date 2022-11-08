@@ -7,16 +7,18 @@ import Nickname from './components/componenteMenu.js';
 import Menu from './components/componenteMenu.js';
 import CreaPartita from './components/componentePartita.js';
 import SceltaCartelle from './components/componenteSceltaCartelle.js';
+import socket from './utils/socket.js';
 
 const Stack = createNativeStackNavigator();
 
 export default function App() {
+    var currentIndex = 0; 
     return (
       
       <NavigationContainer>
          <Stack.Navigator>
-            <Stack.Screen /*options={{ headerShown: false }}*/ name="Home" component={Menu} />
-            <Stack.Screen /*options={{ headerShown: false }}*/ name="Partita" component={CreaPartita} />
+            <Stack.Screen options={{ headerShown: true, headerLeft: () => null }} name="Home" component={Menu} />
+            <Stack.Screen options={{ headerShown: true, headerLeft: () => null }} name="Partita" component={CreaPartita} />
             
          </Stack.Navigator>
       </NavigationContainer>

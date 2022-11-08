@@ -17,13 +17,14 @@ export default class Tabella extends React.Component {
     }
 
     renderRow(row,indexRow){
+        console.log(row)
         return(
             <View style={{ flex: 1, alignSelf: 'stretch', flexDirection: 'row', maxHeight: 50}}>
                 {
                     row.map((cell,indexCell) => {
                         console.log(cell)
                         return (
-                            this.renderCell(cell,indexRow,indexCell)
+                            this.renderCell(cell,indexRow,indexCell, this.state.tabella.length)
                         )
                     })
                 }
@@ -31,24 +32,44 @@ export default class Tabella extends React.Component {
         )
     }
 
-    renderCell(cell,indexRow,indexCell){
-        return(
-            <View style={{ flex: 1, alignSelf: 'stretch', borderWidth: "1px", borderColor: "black", color: "black !important", backgroundColor: "#e28743" }}>
-                {
-                    cell != "" ? 
-                        cell.includes("X") ? 
-                            <TouchableHighlight style={{justifyContent: 'center', minHeight: 50}} onPress={() => {this._alertIndex(indexRow,indexCell)}}>
-                                <Text style={{color: "red !important",borderRadius:"15px", textAlign: "center",  backgroundColor:'red'}}>{cell.replace('X',"")}</Text>
+    renderCell(cell,indexRow,indexCell,length){
+        if(length == 9 || length == 10){
+            return(
+                <View style={{ flex: 1, alignSelf: 'stretch', borderWidth: "1px", borderColor: "black", color: "black !important", backgroundColor: "#e28743" }}>
+                    {
+                        cell != "" ? 
+                            cell.includes("X") ? 
+                                <TouchableHighlight style={{justifyContent: 'center', minHeight: 50}}>
+                                    <Text style={{color: "red !important",borderRadius:"15px", textAlign: "center",  backgroundColor:'red'}}>{cell.replace('X',"")}</Text>
+                                </TouchableHighlight>
+                            : 
+                            <TouchableHighlight style={{justifyContent: 'center', minHeight: 50}}>
+                                <Text style={{color: "black !important",textAlign: "center", paddingBottom: 10, paddingTop: 5}}>{cell}</Text>
                             </TouchableHighlight>
-                        : 
-                        <TouchableHighlight style={{justifyContent: 'center', minHeight: 50}} onPress={() => {this._alertIndex(indexRow,indexCell)}}>
-                            <Text style={{color: "black !important",textAlign: "center", paddingBottom: 10, paddingTop: 5}}>{cell}</Text>
-                        </TouchableHighlight>
-                    :
-                    <TouchableHighlight><Text></Text></TouchableHighlight>
-                }
-            </View>
-        )
+                        :
+                        <TouchableHighlight><Text></Text></TouchableHighlight>
+                    }
+                </View>
+            )
+        }else{
+            return(
+                <View style={{ flex: 1, alignSelf: 'stretch', borderWidth: "1px", borderColor: "black", color: "black !important", backgroundColor: "#e28743" }}>
+                    {
+                        cell != "" ? 
+                            cell.includes("X") ? 
+                                <TouchableHighlight style={{justifyContent: 'center', minHeight: 50}} onPress={() => {this._alertIndex(indexRow,indexCell)}}>
+                                    <Text style={{color: "red !important",borderRadius:"15px", textAlign: "center",  backgroundColor:'red'}}>{cell.replace('X',"")}</Text>
+                                </TouchableHighlight>
+                            : 
+                            <TouchableHighlight style={{justifyContent: 'center', minHeight: 50}} onPress={() => {this._alertIndex(indexRow,indexCell)}}>
+                                <Text style={{color: "black !important",textAlign: "center", paddingBottom: 10, paddingTop: 5}}>{cell}</Text>
+                            </TouchableHighlight>
+                        :
+                        <TouchableHighlight><Text></Text></TouchableHighlight>
+                    }
+                </View>
+            )
+        }
     }
 
     _alertIndex(indexRow,indexCell) {

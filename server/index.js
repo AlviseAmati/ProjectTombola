@@ -28,19 +28,50 @@ socketIO.on("connection", (socket) => {
 	console.log(`⚡: ${socket.id} user just connected!`);
 
 	socket.on("createRoom", (name) => {
-		chatRooms.unshift({ id: generateID(), name, numeriEstratti:[], numeriDaEstrarre: creaArrayDaEstrarre()});
+		chatRooms.unshift({ id: generateID(), giocatori: [], name, numeriEstratti:[], numeriDaEstrarre: creaArrayDaEstrarre()});
 		socket.emit("roomsList", chatRooms);
 	});
+    
+    socket.on("exitRoom", (obj) => {
+        console.log("Esco dalla stanza")
+        for(var i = 0; i < chatRooms.length; i++){
+            for(var j = 0; j < chatRooms[i].giocatori; j++){
+                if(chatRooms[i].giocatori[j].socket == socket.id){
+                    chatRooms[i].giocatori = myArray.splice(j, 1);
+                    console.log("Un giocatore è uscito dalla stanza")
+                }
+            }
+        }
+    })
 
 	socket.on("enterRoom", (obj) => {
-		let result = chatRooms.filter((room) => room.id == obj.id);
-        socket.join(result[0].name);
+		/*let result = chatRooms.filter((room) => room.id == obj.id);*/
+        console.log("Entro nella lobby")
+        console.log(obj)
+        for(var i = 0; i < chatRooms.length; i++){
+            if(chatRooms[i].id == obj.id){
+                chatRooms[i].giocatori.push({
+                    socket: socket.id,
+                    username: obj.username
+                })
+
+                var res = []
+                for(var room of chatRooms[i].giocatori){
+                    res.push(room.username)
+                }
+                socket.join(chatRooms[i].id)
+                socketIO.to(chatRooms[i].id).emit("listaUtenti",res)
+                socket.emit("roomEntered", chatRooms[i].id);
+            }
+        }
+        /*socket.join(result[0].name);
         socket.join(result[0].id)
-        socketIO.to(result[0].id).emit("utenteCollegato",obj.username)
+        
+        socketIO.to(result[0].id).emit("listaUtenti",obj.username)
         console.log(result)
 		// console.log(chatRooms);
 		socket.emit("roomEntered", result[0].id);
-		// console.log("Messages Form", result[0].messages);
+		// console.log("Messages Form", result[0].messages);*/
 	});
 
 	socket.on("disconnect", () => {
