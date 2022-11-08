@@ -2,6 +2,7 @@ const express = require("express");
 const app = express();
 const http = require("http").Server(app);
 const cors = require("cors");
+const { io } = require("socket.io-client");
 const PORT = 4000;
 const socketIO = require("socket.io")(http, {
 	cors: {
@@ -81,9 +82,10 @@ socketIO.on("connection", (socket) => {
 
     socket.on("gameStart", (id) => {
         console.log(id)
-		let result = chatRooms.filter((room) => room.id == id);
+        let result = chatRooms.filter((room) => room.id == id);
         console.log(result)
-        setInterval(() => {estraiNumero(socket,result[0].numeriDaEstrarre, result[0].numeriEstratti,result[0].id)}, 10000)
+        socketIO.to(id).emit("partitaIniziata")
+        setInterval(() => {estraiNumero(socket,result[0].numeriDaEstrarre, result[0].numeriEstratti,result[0].id)}, 6000)
     })
 });
 

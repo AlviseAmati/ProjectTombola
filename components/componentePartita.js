@@ -8,6 +8,7 @@ import BouncyCheckboxGroup from "react-native-bouncy-checkbox-group";
 import ICheckboxButton from "react-native-bouncy-checkbox-group";
 import { Table, TableWrapper, Row, Rows, Col, Cols, Cell } from 'react-native-table-component';
 import Tabella from "./componenteTabellaSingola"
+import Tabellone from "./componenteTabellone"
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import socket from '../utils/socket';
 import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
@@ -29,6 +30,7 @@ export default class CreaPartita extends React.Component {
             tabellone: this.createTabellone(),
             listaGiocatori: [],
             index: 0,
+            partitaIniziata: false,
             statoBottoneTerno: false,
             statoBottoneCinquina: false,
             statoBottoneTombola: false,
@@ -87,14 +89,16 @@ export default class CreaPartita extends React.Component {
         this.props.navigation.setOptions({ title: 'Stanza-' + id })
         console.log(id)
 
-        socket.emit("gameStart", id)
-        socket.on("numeroEstratto", (numeroEstratto) => {
-            var arrayNumeri = this.state.listaNumeri //creo array per fare il tabellone
-            arrayNumeri.push(numeroEstratto)
-            var newTabellone = this.updateTabellone(numeroEstratto)
-            this.setState({ tabellone: newTabellone})
-            this.setState({ numero: numeroEstratto })
-            this.setState({ listaNumeri: arrayNumeri })
+        socket.on("partitaIniziata",() => {
+            this.setState({partitaIniziata: true})
+            socket.on("numeroEstratto", (numeroEstratto) => {
+                var arrayNumeri = this.state.listaNumeri //creo array per fare il tabellone
+                arrayNumeri.push(numeroEstratto)
+                var newTabellone = this.updateTabellone(numeroEstratto)
+                this.setState({ tabellone: newTabellone})
+                this.setState({ numero: numeroEstratto })
+                this.setState({ listaNumeri: arrayNumeri })
+            })
         })
 
         socket.on("listaUtenti", (players) => {
@@ -170,6 +174,13 @@ export default class CreaPartita extends React.Component {
             <View style={[styles.containerPartita]}>
                 <View>
                     {
+                        this.state.partitaIniziata == false ? 
+                            <Button color="green" title="Inizia partita" onPress={async () => {
+                                socket.emit("gameStart", await AsyncStorage.getItem("id"))
+                            }}></Button>
+                        : <></>
+                    }
+                    {
                         this.state.listaGiocatori.map((nome) => {
                             return (
                                 <Text style={{ marginBottom: '5%' }}>{nome}</Text>
@@ -206,7 +217,7 @@ export default class CreaPartita extends React.Component {
         const SecondRoute = () => {
             return (
                 <>
-                    <Tabella tabella={this.state.tabellone} />
+                    <Tabellone tabella={this.state.tabellone} />
                     <View style={{ height: 25 }} />
                 </>
             )

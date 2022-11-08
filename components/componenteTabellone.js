@@ -8,7 +8,7 @@ import BouncyCheckboxGroup from "react-native-bouncy-checkbox-group";
 import ICheckboxButton from "react-native-bouncy-checkbox-group";
 import { Table, TableWrapper, Row, Rows, Col, Cols, Cell } from 'react-native-table-component';
 
-export default class Tabella extends React.Component {
+export default class Tabellone extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -52,20 +52,10 @@ export default class Tabella extends React.Component {
         )
     }
 
-    _alertIndex(indexRow,indexCell) {
-        let newArr = [...this.state.tabella];
-        if(newArr[indexRow][indexCell].includes("X")){
-            newArr[indexRow][indexCell] = newArr[indexRow][indexCell].replace("X","")
-        }else{
-            newArr[indexRow][indexCell] = newArr[indexRow][indexCell] + "X";
-        }
-        this.setState({tabella: newArr})
-    }
-
     render(){
         console.log(this.state.tabella)
         return (
-            <View style={{ height: '20%', flexDirection: 'column', alignItems: 'center' }}>
+            <View style={{ height: '100%', flexDirection: 'column', alignItems: 'center' }}>
                 {
                     this.state.tabella.map((row,index) => {
                         return (
