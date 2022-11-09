@@ -85,7 +85,12 @@ socketIO.on("connection", (socket) => {
         let result = chatRooms.filter((room) => room.id == id);
         console.log(result)
         socketIO.to(id).emit("partitaIniziata")
-        setInterval(() => {estraiNumero(socket,result[0].numeriDaEstrarre, result[0].numeriEstratti,result[0].id)}, 6000)
+        setInterval(() => {estraiNumero(socket,result[0].numeriDaEstrarre, result[0].numeriEstratti,result[0].id)}, 5500)
+    })
+
+    socket.on("terno", () => {
+        console.log('terno')
+        
     })
 });
 

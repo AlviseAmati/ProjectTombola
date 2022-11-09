@@ -17,12 +17,12 @@ export default class Tabella extends React.Component {
     }
 
     renderRow(row,indexRow){
-        console.log(row)
+        
         return(
             <View style={{ flex: 1, alignSelf: 'stretch', flexDirection: 'row', maxHeight: 50}}>
                 {
                     row.map((cell,indexCell) => {
-                        console.log(cell)
+                        
                         return (
                             this.renderCell(cell,indexRow,indexCell, this.state.tabella.length)
                         )
@@ -52,7 +52,7 @@ export default class Tabella extends React.Component {
         )
     }
 
-    _alertIndex(indexRow,indexCell) {
+    _alertIndex(indexRow,indexCell) { //aggiunge una X a numero cliccati es: 33X
         let newArr = [...this.state.tabella];
         if(newArr[indexRow][indexCell].includes("X")){
             newArr[indexRow][indexCell] = newArr[indexRow][indexCell].replace("X","")
@@ -63,7 +63,7 @@ export default class Tabella extends React.Component {
     }
 
     render(){
-        console.log(this.state.tabella)
+        
         return (
             <View style={{ height: '20%', flexDirection: 'column', alignItems: 'center' }}>
                 {

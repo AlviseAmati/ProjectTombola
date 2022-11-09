@@ -6,7 +6,6 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Nickname from './components/componenteMenu.js';
 import Menu from './components/componenteMenu.js';
 import CreaPartita from './components/componentePartita.js';
-import SceltaCartelle from './components/componenteSceltaCartelle.js';
 import socket from './utils/socket.js';
 
 const Stack = createNativeStackNavigator();
