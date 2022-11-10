@@ -17,12 +17,10 @@ export default class Tabellone extends React.Component {
     }
 
     renderRow(row,indexRow){
-        console.log(row)
         return(
             <View style={{ flex: 1, alignSelf: 'stretch', flexDirection: 'row', maxHeight: 50}}>
                 {
                     row.map((cell,indexCell) => {
-                        console.log(cell)
                         return (
                             this.renderCell(cell,indexRow,indexCell, this.state.tabella.length)
                         )
@@ -53,7 +51,6 @@ export default class Tabellone extends React.Component {
     }
 
     render(){
-        console.log(this.state.tabella)
         return (
             <View style={{ height: '100%', flexDirection: 'column', alignItems: 'center' }}>
                 {

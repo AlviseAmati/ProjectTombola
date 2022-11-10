@@ -6,7 +6,7 @@ const { io } = require("socket.io-client");
 const PORT = 4000;
 const socketIO = require("socket.io")(http, {
 	cors: {
-		origin: "http://localhost:19006",
+		origin: "*",
 	},
 });
 
@@ -25,21 +25,36 @@ function creaArrayDaEstrarre(){
     return temp
 }
 
+function trovaGameDaUnPlayer(id){
+    for(var r of chatRooms){
+        for(var g of r.giocatori){
+            if(g.socket == id){
+                var obj = {
+                    player: g,
+                    room: r
+                }
+                return obj
+            }
+        }
+    }
+}
+
 socketIO.on("connection", (socket) => {
 	console.log(`⚡: ${socket.id} user just connected!`);
 
 	socket.on("createRoom", (name) => {
-		chatRooms.unshift({ id: generateID(), giocatori: [], name, numeriEstratti:[], numeriDaEstrarre: creaArrayDaEstrarre()});
+		chatRooms.unshift({ id: generateID(),iniziata: false, giocatori: [], name, numeriEstratti:[], numeriDaEstrarre: creaArrayDaEstrarre()});
 		socket.emit("roomsList", chatRooms);
 	});
     
-    socket.on("exitRoom", (obj) => {
-        console.log("Esco dalla stanza")
+    socket.on("exitRoom", () => {
         for(var i = 0; i < chatRooms.length; i++){
-            for(var j = 0; j < chatRooms[i].giocatori; j++){
+            for(var j = 0; j < chatRooms[i].giocatori.length; j++){
                 if(chatRooms[i].giocatori[j].socket == socket.id){
-                    chatRooms[i].giocatori = myArray.splice(j, 1);
-                    console.log("Un giocatore è uscito dalla stanza")
+                    chatRooms[i].giocatori.splice(j, 1);
+                    console.log("Rimosso utente dalla lobby")
+                    socketIO.to(chatRooms[i].id).emit("playerUscito",{id: socket.id, username: chatRooms[i].giocatori[j].username})
+                    //console.log("Un giocatore è uscito dalla stanza")
                 }
             }
         }
@@ -51,18 +66,19 @@ socketIO.on("connection", (socket) => {
         console.log(obj)
         for(var i = 0; i < chatRooms.length; i++){
             if(chatRooms[i].id == obj.id){
-                chatRooms[i].giocatori.push({
-                    socket: socket.id,
-                    username: obj.username
-                })
-
-                var res = []
-                for(var room of chatRooms[i].giocatori){
-                    res.push(room.username)
+                console.log("Iniziata: ")
+                console.log(chatRooms[i].iniziata)
+                if(chatRooms[i].iniziata == false){
+                    chatRooms[i].giocatori.push({
+                        socket: socket.id,
+                        username: obj.username
+                    })
+                    socket.join(chatRooms[i].id)
+                    socketIO.to(chatRooms[i].id).emit("nuovoPlayerEntrato",obj.username)
+                    socket.emit("roomEntered", chatRooms[i].id);
+                }else{
+                    socket.emit("erroreEnterRoom")
                 }
-                socket.join(chatRooms[i].id)
-                socketIO.to(chatRooms[i].id).emit("listaUtenti",res)
-                socket.emit("roomEntered", chatRooms[i].id);
             }
         }
 	});
@@ -72,52 +88,64 @@ socketIO.on("connection", (socket) => {
 		console.log("🔥: A user disconnected");
 	});
 
-    socket.on("gameStart", (id) => {
-        console.log(id)
-        let result = chatRooms.filter((room) => room.id == id);
-        console.log(result)
-        socketIO.to(id).emit("partitaIniziata")
-        setInterval(() => {estraiNumero(socket,result[0].numeriDaEstrarre, result[0].numeriEstratti,result[0].id)}, 5500)
+    socket.on("gameStart", () => {
+        const { room, player } = trovaGameDaUnPlayer(socket.id)
+        if(room != null){
+            socketIO.to(room.id).emit("partitaIniziata")
+            console.log(room)
+            chatRooms[chatRooms.indexOf(room)].iniziata = true
+            estraiNumero(room.numeriDaEstrarre, room.numeriEstratti,room.id)
+        }
     })
 
-    socket.on("terno", (id) => {
-        console.log('terno')
-        console.log(id)
-        let result = chatRooms.filter((room) => room.id == id); 
-        console.log(result)
-        socketIO.to(id).emit("terno")
-        
+    socket.on("terno", () => {
+        const { room, player } = trovaGameDaUnPlayer(socket.id)
+        console.log("Terno fatto")
+        if(room != null){
+            socketIO.to(room.id).emit("ternoFatto",{
+                username: player.username,
+                id: socket.id
+            })
+        }
     })
-    socket.on("cinquina", (id) => {
-        console.log('cinquina')
-        console.log(id)
-        let result = chatRooms.filter((room) => room.id == id); 
-        console.log(result)
-        socketIO.to(id).emit("cinquina")
-        
+
+    socket.on("cinquina", () => {
+        const { room, player } = trovaGameDaUnPlayer(socket.id)
+        if(room != null){
+            socketIO.to(room.id).emit("cinquinaFatta",{
+                username: player.username,
+                id: socket.id
+            })
+        }
     })
-    socket.on("tombola", (id) => {
-        console.log('tombola')
-        console.log(id)
-        let result = chatRooms.filter((room) => room.id == id); 
-        console.log(result)
-        socketIO.to(id).emit("tombola")
-        
+
+    socket.on("tombola", () => {
+        const { room, player } = trovaGameDaUnPlayer(socket.id)
+        if(room != null){
+            socketIO.to(room.id).emit("tombolaFatta",{
+                username: player.username,
+                id: socket.id
+            })
+        }
     })
 });
 
-function estraiNumero(socket,numeriDaEstrarre,numeriEstratti,id){
-    const random = Math.floor(Math.random() * numeriDaEstrarre.length);
-    var numeroEstratto = numeriDaEstrarre[random]
-    numeriEstratti.push(numeroEstratto)
-    socketIO.to(id).emit("numeroEstratto",numeriDaEstrarre[random])
-    numeriDaEstrarre.splice(random - 1, 1);
-    console.log(numeriEstratti.length)
-    console.log(numeriDaEstrarre.length)
+function estraiNumero(numeriDaEstrarre,numeriEstratti,id){
+    if(numeriDaEstrarre.length == 0){
+        socketIO.to(id).emit("partitaFinita")
+    }else{
+        const random = Math.floor(Math.random() * numeriDaEstrarre.length);
+        var numeroEstratto = numeriDaEstrarre[random]
+        numeriEstratti.push(numeroEstratto)
+        socketIO.to(id).emit("numeroEstratto",numeriDaEstrarre[random])
+        numeriDaEstrarre.splice(random, 1);
+        /*console.log("Numeri estratti: " + numeriEstratti.length)
+        console.log("Numeri da estrarre: " + numeriDaEstrarre.length)*/
+        setTimeout(() => {estraiNumero(numeriDaEstrarre,numeriEstratti,id)}, 3000)
+    }
 }
 
 app.get("/api", (req, res) => {
-    console.log("Richiedo stanze")
 	res.json(chatRooms);
 });
 

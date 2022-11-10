@@ -5,7 +5,8 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/stack';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import socket from "../utils/socket"
-
+import ModalErrore from './modalErrore';
+import { timingSafeEqual } from 'crypto';
 
 export default class Menu extends React.Component {
   constructor(props) { //per passare proprieta did ef acnhe il navigation
@@ -17,7 +18,8 @@ export default class Menu extends React.Component {
       usernameScelto: false,
       partitaCreata: false,
       username: '',
-      stanze: null
+      stanze: null,
+      errorePartita: false
     }
   }
   
@@ -35,7 +37,7 @@ export default class Menu extends React.Component {
 
   makeRequest = () => {
     const fetchGroups = () => {
-			fetch("http://192.168.68.109/api") // err 404 faild to fetch
+			fetch("http://192.168.1.128:4000/api") // err 404 faild to fetch
 				.then((res) => res.json())
 				.then((data) => {
           console.log("Stanze")
@@ -47,30 +49,15 @@ export default class Menu extends React.Component {
 		fetchGroups();
   }
 
-  // Funzione che viene fatta partire quando il componente viene chiamato
-
-  /*onSubmit = async () => {  //per salvare i dati persistenti
-    try {
-      this.setState({ token: 'abc123' })
-      AsyncStorage.setItem('username', this.state.username)
-      AsyncStorage.setItem('token', 'abc123')
-    }
-    catch (err) {
-      console.log(err)
-    }
-  }*/
-
   getData = async () => { //per leggere i dati salvati
     try {
       const chiave = await AsyncStorage.getItem('token')
       const username = await AsyncStorage.getItem('username');
       if(chiave !== null){
         this.setState({token: chiave})
-        //valore gia salvato in precedenza
       }
       if(username !== null){
         this.setState({username})
-        //valore gia salvato in precedenza
       }
     } catch (e) {
       Alert.alert("Error! While saving username");
@@ -87,16 +74,6 @@ export default class Menu extends React.Component {
     }
     console.log('rimosso dato')
   }
-
- /* storeUsername = async () => { 
-    try {
-      await AsyncStorage.setItem("username", username);
-      navigation.navigate("Chat");
-    } catch (e) {
-      Alert.alert("Error! While saving username");
-    }
-  }*/
-
 
   onChangeTextHandler = (text) => {
     this.setState({ username: text });
@@ -119,6 +96,7 @@ export default class Menu extends React.Component {
       //salvare nel server user
     }
 
+    this.makeRequest()
     setInterval(this.makeRequest, 5000)
 
     //socket.emit("newMessage", {});
@@ -127,7 +105,6 @@ export default class Menu extends React.Component {
   eseguiBottonePartita = () => {
     //this.setState({ partitaCreata: !this.state.partitaCreata })
     socket.emit("createRoom","Stanza")
-    
   }
 
   enterRoom = async(id) => {
@@ -138,6 +115,14 @@ export default class Menu extends React.Component {
       await AsyncStorage.setItem("id",idRoom)
       this.props.navigation.navigate("Partita")
     })
+
+    socket.on("erroreEnterRoom",() => {
+      this.setState({errorePartita: true})
+    })
+  }
+
+  disableModal = () => {
+    this.setState({errorePartita: false})
   }
 
   render() {
@@ -147,7 +132,7 @@ export default class Menu extends React.Component {
         <View style={styles.containerHome} >
           <Text style={styles.titleHome}>TOMBOLA</Text>
           <TextInput username={this.state.username} style={styles.inputNickname} placeholder="scegli nickname" onChangeText={this.onChangeTextHandler}></TextInput>
-          <Button color="red" title='Gioca!' onPress={() => this.eseguiBottoneNick()}></Button>
+          <Button color="#373F51" title='Gioca!' onPress={() => this.eseguiBottoneNick()}></Button>
           <StatusBar style="auto" />
         </View>
       );
@@ -159,6 +144,9 @@ export default class Menu extends React.Component {
           <View style={{ position: 'absolute',/*flexDirection: 'row',*/ top: '20%', }}>
             <Button color="red" title='Crea Partita' onPress={() => this.eseguiBottonePartita()}></Button>
           </View>
+          {
+            this.state.errorePartita ? <ModalErrore disableModal={this.disableModal}/> : <></>
+          }
           {
             this.state.stanze != null ? 
               this.state.stanze.map((stanza) => {
@@ -185,7 +173,7 @@ export default class Menu extends React.Component {
 const styles = StyleSheet.create({
   containerHome: {
     flex: 1,
-    backgroundColor: 'yellow',
+    backgroundColor: '#58A4B0',
     alignItems: 'center',
     justifyContent: 'center',
   },

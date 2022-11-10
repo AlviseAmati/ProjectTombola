@@ -1,6 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import React from 'react';
-import { StyleSheet, Text, View, TextInput, Button, TouchableOpacity, Alert, TouchableHighlight, useWindowDimensions, Dimensions, TouchableHighlightBase } from 'react-native';
+import { StyleSheet, Text, View, ScrollView, TextInput, Button, TouchableOpacity, Alert, TouchableHighlight, useWindowDimensions, Dimensions, TouchableHighlightBase } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/stack';
 import BouncyCheckbox from "react-native-bouncy-checkbox";
@@ -29,6 +29,7 @@ export default class CreaPartita extends React.Component {
             listaNumeri: [],
             tabellone: this.createTabellone(),
             listaGiocatori: [],
+            listaGiocatoriRisultati: ["","",""],
             index: 0,
             partitaIniziata: false,
             statoBottoneTerno: false,
@@ -39,7 +40,8 @@ export default class CreaPartita extends React.Component {
             routes: [
                 { key: 'first', title: 'Gioco' },
                 { key: 'second', title: 'Tabellone' },
-            ]
+            ],
+            messaggi: []
         }
     }
 
@@ -58,11 +60,6 @@ export default class CreaPartita extends React.Component {
         return arr
     }
 
-    /* async prelevaNickname() { //far partire questa funzione a onLOAD pagina
-         var username = await AsyncStorage.getItem('username');
-         this.setState({ listaGiocatori: username })
-     }*/
-
     generaNumero = (numero) => {
         numero = Math.floor(Math.random() * 90) + 1;
         this.setState({ numero: numero })
@@ -76,9 +73,6 @@ export default class CreaPartita extends React.Component {
                     tabelloneNew[i][j] = tabelloneNew[i][j] + "X"
                 }
             }
-            /*if(i == numeroEstratto){
-                tabelloneNew[i] = tabelloneNew[i] + "X"
-            }*/
         }
         return tabelloneNew
     }
@@ -92,6 +86,8 @@ export default class CreaPartita extends React.Component {
 
         socket.on("partitaIniziata", () => {
             this.setState({ partitaIniziata: true })
+            this.aggiungiMessaggio("Partita iniziata")
+
             socket.on("numeroEstratto", (numeroEstratto) => {
                 var arrayNumeri = this.state.listaNumeri //creo array per fare il tabellone
                 arrayNumeri.push(numeroEstratto)
@@ -100,24 +96,79 @@ export default class CreaPartita extends React.Component {
                 this.setState({ numero: numeroEstratto })
                 this.setState({ listaNumeri: arrayNumeri })
             })
-            socket.on("terno", () =>{
+
+            socket.on("ternoFatto", ({id,username}) => {
                 this.setState({ statoBottoneTerno: !this.state.statoBottoneTerno });
+                var copyArrRes = this.state.listaGiocatoriRisultati
+                copyArrRes[0] = username 
+
+                if(id == socket.id){
+                    this.aggiungiMessaggio(`Hai fatto terno!`)
+                }else{
+                    this.aggiungiMessaggio(`Il giocatore ${username} ha fatto terno!`)
+                }
+
+                this.setState({ listaGiocatoriRisultati: copyArrRes})
             })
-            socket.on("cinquina", () =>{
+
+            socket.on("cinquinaFatta", ({id,username}) => {
                 this.setState({ statoBottoneCinquina: !this.state.statoBottoneCinquina });
+                var copyArrRes = this.state.listaGiocatoriRisultati
+                copyArrRes[0] = username 
+
+                if(id == socket.id){
+                    this.aggiungiMessaggio(`Hai fatto cinquina!`)
+                }else{
+                    this.aggiungiMessaggio(`Il giocatore ${username} ha fatto cinquina!`)
+                }
+                
+                this.setState({ listaGiocatoriRisultati: copyArrRes})
             })
-            socket.on("tombola", () =>{
+
+            socket.on("tombolaFatta", ({id,username}) => {
                 this.setState({ statoBottoneTombola: !this.state.statoBottoneTombola });
+                var copyArrRes = this.state.listaGiocatoriRisultati
+                copyArrRes[0] = username 
+
+                if(id == socket.id){
+                    this.aggiungiMessaggio(`Hai fatto tombola!`)
+                }else{
+                    this.aggiungiMessaggio(`Il giocatore ${username} ha fatto tombola!`)
+                }
+
+                this.setState({ listaGiocatoriRisultati: copyArrRes})
+                this.setState({ statoPartitaFinita: true})
             })
         })
 
-        socket.on("listaUtenti", (players) => {
-            //this.setState({numero: numeroEstratto})
-            console.log("Nuovi players")
-            console.log(players)
-            var newArray = players
-            this.setState({ listaGiocatori: newArray })
+        socket.on("playerUscito",({id, username}) => {
+            console.log("Player uscito")
+            if(id == socket.id){
+                this.props.navigation.navigate("Home")
+            }else{
+                this.aggiungiMessaggio(`Il giocatore ${username} è uscito dalla partita :(`)
+            }
         })
+
+        socket.on("nuovoPlayerEntrato", (giocatore) => {
+            var copy = this.state.listaGiocatori
+            copy.push(giocatore)
+            
+            var msg = `Il giocatore ${giocatore} è entrato!`
+            this.aggiungiMessaggio(msg)
+            this.setState({listaGiocatori: copy})
+        })
+    }
+
+    aggiungiMessaggio = (text) => {
+        var copy = this.state.messaggi
+        copy.push(text)
+        this.setState({messaggi: copy})
+    }
+
+    esciDallaPartita = () => {
+        socket.emit("exitRoom")
+        
     }
 
     generaCarta = () => {
@@ -162,7 +213,7 @@ export default class CreaPartita extends React.Component {
         return card;
     }
 
-    disabilitaBottoneTerno = async() => {
+    provaTerno = async() => {
         console.log('bottone terno cliccato')
         for (var i=0; i < this.state.tabelle.length; i++) {
             console.log('tabella')
@@ -177,69 +228,81 @@ export default class CreaPartita extends React.Component {
                         var indice = this.state.listaNumeri.indexOf(parseInt(tabella[r][c].toString().split('X')[0])) //controllo se numero e uscito
                         console.log(indice)
                        if(indice != -1){
-                            //trovato numero nel tabellone
-                            contatoreCelle++;
+                        contatoreCelle++;
                        }
-                       
                     }
                 }
                 if (contatoreCelle >= 3) {
-                    socket.emit('terno',await AsyncStorage.getItem("id"))
+                    console.log("terno")
+                    socket.emit('terno')
                     return
                 }
             }
         }
-       
     }
-    disabilitaBottoneCinquina = async() => {
-        for (var i; i < this.state.tabelle.length; i++) {
+
+    provaCinquina = async() => {
+        console.log('bottone cinquina cliccato')
+        for (var i=0; i < this.state.tabelle.length; i++) {
+            console.log('tabella')
             var tabella = this.state.tabelle[i]
-            for (var r; r < tabella.lengt; r++) { //ciclo riga
+            for (var r=0; r < tabella.length; r++) { //ciclo riga
+                console.log('riga')
                 var contatoreCelle = 0;
-                for (var c; c < tabella[r].lengt; c++) {//ciclo singole celle
-                    var indice = this.state.listaNumeri.indexOf(parseInt(tabella[r][c].toString().split('X')[0])) //controllo se numero e uscito
-                    if(indice != -1){
-                         //trovato numero nel tabellone
-                         contatoreCelle++;
+                for (var c=0; c < tabella[r].length; c++) {//ciclo singole celle
+                    console.log('cella')
+                    
+                    if (tabella[r][c].toString().includes("X")) {
+                        var indice = this.state.listaNumeri.indexOf(parseInt(tabella[r][c].toString().split('X')[0])) //controllo se numero e uscito
+                        console.log(indice)
+                        if(indice != -1){
+                            contatoreCelle++;
+                        }
+                       
                     }
                 }
-                if (contatoreCelle >= 5) {
-                    socket.emit('cinquina',await AsyncStorage.getItem("id"))
-                    console.log('cinquina')
+                if (contatoreCelle == 5) {
+                    console.log("cinquina")
+                    socket.emit('cinquina')
                     return
                 }
             }
         }
       
     }
-    disabilitaBottoneTombola = async() => {
-        for (var i; i < this.state.tabelle.length; i++) {
+
+    provaTombola = async() => {
+        console.log('bottone cinquina cliccato')
+        for (var i=0; i < this.state.tabelle.length; i++) {
+            console.log('tabella')
             var tabella = this.state.tabelle[i]
-            var contatoreTotale =0;
-            for (var r; r < tabella.lengt; r++) { //ciclo riga
+            var contatoreTotale = 0
+            for (var r=0; r < tabella.length; r++) { //ciclo riga
+                console.log('riga')
                 var contatoreCelle = 0;
-                for (var c; c < tabella[r].lengt; c++) {//ciclo singole celle
-                    var indice = this.state.listaNumeri.indexOf(parseInt(tabella[r][c].toString().split('X')[0])) //controllo se numero e uscito
-                    if(indice != -1){
-                         //trovato numero nel tabellone
-                         contatoreCelle++;
+                for (var c=0; c < tabella[r].length; c++) {//ciclo singole celle
+                    console.log('cella')
+                    
+                    if (tabella[r][c].toString().includes("X")) {
+                        var indice = this.state.listaNumeri.indexOf(parseInt(tabella[r][c].toString().split('X')[0])) //controllo se numero e uscito
+                        console.log(indice)
+                        if(indice != -1){
+                            contatoreCelle++;
+                        }
                     }
                 }
-                contatoreTotale += contatoreCelle
-               
             }
-            if (contatoreTotale = 15) {
-                socket.emit('tombola',await AsyncStorage.getItem("id"))
-                console.log('tombola')
+            if (contatoreTotale == 15) {
+                console.log("tombola")
+                socket.emit('tombola')
                 return
             }
         }
-      
     }
+
     cambiaViewPunteggio = () => {
         var variabile = true;
         this.setState({ statoPartitaFinita: variabile });
-
     }
 
     render() {
@@ -247,20 +310,13 @@ export default class CreaPartita extends React.Component {
 
         const FirstRoute = () => (
             <View style={[styles.containerPartita]}>
-                <View>
+                <View style={styles.buttonIniziaPartita}>
                     {
                         this.state.partitaIniziata == false ?
-                            <Button color="red" title="Inizia partita" onPress={async () => {
+                            <Button style={styles.buttonIniziaPartita} color="red" title="Inizia partita" onPress={async () => {
                                 socket.emit("gameStart", await AsyncStorage.getItem("id"))
                             }}></Button>
                             : <></>
-                    }
-                    {
-                        this.state.listaGiocatori.map((nome) => {
-                            return (
-                                <Text style={{ marginBottom: '5%' }}>{nome}</Text>
-                            )
-                        })
                     }
                 </View>
                 {
@@ -273,21 +329,25 @@ export default class CreaPartita extends React.Component {
                         )
                     })
                 }
-                <Text style={styles.titleNick}>il numero e: <Text style={styles.numero}>{this.state.numero}</Text></Text>
+                <Text style={styles.divNumero}>E' uscito il numero: </Text>
+                <Text style={styles.numero}>{this.state.numero}</Text>
                 <View style={styles.viewBottoniPunteggi}>
-                    <Button color="red" title="Terno" disabled={this.state.statoBottoneTerno} onPress={() => this.disabilitaBottoneTerno()} />
-                    <Button color="red" title="Cinquina" disabled={this.state.statoBottoneCinquina} onPress={() => this.disabilitaBottoneCinquina()} />
-                    <Button color="red" title="Tombola!" disabled={this.state.statoBottoneTombola} onPress={() => this.disabilitaBottoneTombola()} />
+                    <Button color="red" title="Terno" disabled={this.state.statoBottoneTerno} onPress={() => this.provaTerno()} />
+                    <Button color="red" title="Cinquina" disabled={this.state.statoBottoneCinquina} onPress={() => this.provaCinquina()} />
+                    <Button color="red" title="Tombola!" disabled={this.state.statoBottoneTombola} onPress={() => this.provaTombola()} />
                 </View>
-
-                <Button color="red" title='Exit Prova' onPress={() => this.cambiaViewPunteggio()}></Button>
+                <ScrollView style={styles.viewLog}>
+                    {
+                        this.state.messaggi.map((mess) => {
+                            return (
+                                <Text>{mess}</Text>
+                            )
+                        })
+                    }
+                </ScrollView>
+                <Button color="red" title='Exit' onPress={() => this.esciDallaPartita()}></Button>
             </View>
         );
-        /*const SecondRoute = () => (
-            <View style={[styles.scene, { backgroundColor: 'yellow' }]} >
-                <Text style={styles.titleNick}>il numero e: {this.state.listaNumeri.join(", ")}</Text>
-            </View>
-        );*/
 
         const SecondRoute = () => {
             return (
@@ -323,8 +383,11 @@ export default class CreaPartita extends React.Component {
         else { //view fine partita
             return (
                 <View style={styles.containerHome} >
-                    <Text style={styles.titleHome}>PUNTEGGIO:</Text>
-                    <Text style={styles.titleNick}>il vincitore e: </Text>
+                    <Text style={styles.titleNick}>Il giocatore {this.state.listaGiocatoriRisultati[2]} ha fatto TERNO</Text>
+                    <Text style={styles.titleNick}>Il giocatore {this.state.listaGiocatoriRisultati[1]} ha fatto CINQUINA</Text>
+                    <Text style={styles.titleNick}>Il giocatore {this.state.listaGiocatoriRisultati[0]} ha fatto TOMBOLA</Text>
+                    <Text style={styles.titleNick}>Il giocatore {this.state.listaGiocatoriRisultati[0]} ha VINTO</Text>
+
                     <Button color="red" title='Exit' onPress={() => this.props.navigation.navigate('Home')}></Button>
                     <StatusBar style="auto" />
                 </View>
@@ -345,16 +408,35 @@ const styles = StyleSheet.create({
         flex: 1,
     },
 
+    divNumero:{
+        textAlign: 'center'
+    },  
+
     numero: {
         //fontSize: '20%',
-        fontWeight: 'bold'
+        fontWeight: 'bold',
+        textAlign: 'center'
+    },
+
+    buttonIniziaPartita: {
+        borderRadius: "5px",
+        marginBottom: "20px"
     },
 
     viewBottoniPunteggi: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        marginBottom: '30%',
         marginTop: '10%'
+    },
+
+    viewLog: {
+        backgroundColor: "#F5D6BA",
+        paddingTop: "10px",
+        paddingLeft: "10px",
+        height: "100px",
+        marginTop: "20px",
+        marginBottom: "20px",
+        borderRadius: "5px"
     },
 
     tablePartita: {
