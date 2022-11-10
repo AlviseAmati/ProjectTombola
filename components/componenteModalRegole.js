@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Alert, Modal, StyleSheet, Text, Pressable, View } from "react-native";
 
-const App = () => {
+const ModalView = () => {
   const [modalVisible, setModalVisible] = useState(false);
   return (
     <View style={styles.centeredView}>
@@ -16,12 +16,17 @@ const App = () => {
       >
         <View style={styles.centeredView}>
           <View style={styles.modalView}>
-            <Text style={styles.modalText}>Hello World!</Text>
+            <Text style={styles.modalText}>Benvenuto nella nostra app Tombola; in questa schermata dovrai inserire un nickname a piacimento ed accederai nella prossima
+             schermata dove potrai entrare in una partita presente nella lista o crearne una nuova e connetterti. Successivamente sarai nel pieno del gioco dove dopo
+             che la partita e' iniziata dovrai cliccare per "seganre" i numeri usciti e cliccare su i bottoni per confermare i traguardi raggiunti(terno = 3 numeri in una riga, cinquina= una riga intera). Nella Box in basso
+             visualizzerai gli stati e punti fatti nella stanza e se fai tombola(casella completa) la partita termina con un vincitore!
+
+            </Text>
             <Pressable
               style={[styles.button, styles.buttonClose]}
               onPress={() => setModalVisible(!modalVisible)}
             >
-              <Text style={styles.textStyle}>Hide Modal</Text>
+              <Text style={styles.textStyle}>Nascondi Regolamento</Text>
             </Pressable>
           </View>
         </View>
@@ -30,7 +35,7 @@ const App = () => {
         style={[styles.button, styles.buttonOpen]}
         onPress={() => setModalVisible(true)}
       >
-        <Text style={styles.textStyle}>Show Modal</Text>
+        <Text style={styles.textStyle}>Mostra Regolamento</Text>
       </Pressable>
     </View>
   );
@@ -40,11 +45,10 @@ const styles = StyleSheet.create({
   centeredView: {
     flex: 1,
     justifyContent: "center",
-    alignItems: "center",
-    marginTop: 22
+    alignItems: "center"
   },
   modalView: {
-    margin: 20,
+    
     backgroundColor: "white",
     borderRadius: 20,
     padding: 35,
@@ -64,10 +68,10 @@ const styles = StyleSheet.create({
     elevation: 2
   },
   buttonOpen: {
-    backgroundColor: "#F194FF",
+    backgroundColor: "#0E5E6F",
   },
   buttonClose: {
-    backgroundColor: "#2196F3",
+    backgroundColor: "#0E5E6F",
   },
   textStyle: {
     color: "white",
@@ -80,4 +84,4 @@ const styles = StyleSheet.create({
   }
 });
 
-export default App;
+export default ModalView;

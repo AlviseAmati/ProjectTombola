@@ -141,7 +141,7 @@ function estraiNumero(numeriDaEstrarre,numeriEstratti,id){
         numeriDaEstrarre.splice(random, 1);
         /*console.log("Numeri estratti: " + numeriEstratti.length)
         console.log("Numeri da estrarre: " + numeriDaEstrarre.length)*/
-        setTimeout(() => {estraiNumero(numeriDaEstrarre,numeriEstratti,id)}, 3000)
+        setTimeout(() => {estraiNumero(numeriDaEstrarre,numeriEstratti,id)}, 4500)
     }
 }
 

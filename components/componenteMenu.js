@@ -6,6 +6,7 @@ import { createNativeStackNavigator } from '@react-navigation/stack';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import socket from "../utils/socket"
 import ModalErrore from './modalErrore';
+import ModalView from "./componenteModalRegole"
 
 
 export default class Menu extends React.Component {
@@ -27,7 +28,7 @@ export default class Menu extends React.Component {
 
   }
 
-  componentDidMount(){
+  componentDidMount(){ 
     socket.on("roomsList",(rooms) => {
       this.setState({stanze: rooms})
       console.log("Nuove partite")
@@ -132,17 +133,17 @@ export default class Menu extends React.Component {
         <View style={styles.containerHome} >
           <Text style={styles.titleHome}>TOMBOLA</Text>
           <TextInput username={this.state.username} style={styles.inputNickname} placeholder="scegli nickname" onChangeText={this.onChangeTextHandler}></TextInput>
-          <Button color="#373F51" title='Gioca!' onPress={() => this.eseguiBottoneNick()}></Button>
-          <StatusBar style="auto" />
+          <Button style={styles.bottoneGioca} color="#0E5E6F" title='Gioca!' onPress={() => this.eseguiBottoneNick()}></Button>
+          <ModalView/>
         </View>
       );
     }
     else if (this.state.partitaCreata == false) {
       return (
         <View style={styles.containerHome}>
-          <Text style={styles.titleNick}>il tuo username e: {this.state.username}</Text>
+          <Text style={styles.titleNick}>il tuo username e: <Text style={styles.user}>{this.state.username}</Text></Text>
           <View style={{ position: 'absolute',/*flexDirection: 'row',*/ top: '20%', }}>
-            <Button color="red" title='Crea Partita' onPress={() => this.eseguiBottonePartita()}></Button>
+            <Button color="#0E5E6F" title='Crea Partita' onPress={() => this.eseguiBottonePartita()}></Button>
           </View>
           {
             this.state.errorePartita ? <ModalErrore disableModal={this.disableModal}/> : <></>
@@ -152,15 +153,15 @@ export default class Menu extends React.Component {
               this.state.stanze.map((stanza) => {
                 return (
                   <TouchableHighlight onPress={() => this.enterRoom(stanza.id)}>
-                    <View>
-                      <Text>{stanza.name}-{stanza.id}</Text>
+                    <View style={styles.stanzeView}>
+                      <Text style={styles.stanze}>{stanza.name}-{stanza.id}</Text>
                     </View>
                   </TouchableHighlight>
                 )
               })
             : console.log("Caricamento in corso")
           }
-          <Button color="red" title='Indietro' onPress={() => this.eseguiBottoneNick()}></Button>
+          <Button style={styles.indietro} color="#0E5E6F" title='Indietro' onPress={() => this.eseguiBottoneNick()}></Button>
         </View>
       );
     }else{
@@ -173,17 +174,31 @@ export default class Menu extends React.Component {
 const styles = StyleSheet.create({
   containerHome: {
     flex: 1,
-    backgroundColor: '#58A4B0',
+    backgroundColor: '#F2DEBA',
     alignItems: 'center',
     justifyContent: 'center',
   },
   titleHome: {
-    color: 'red',
+    marginTop: '70%',
+    color: '#0E5E6F',
     fontSize: '40%',
     fontWeight: 'bold',
     alignItems: 'center',
     justifyContent: 'center',
   },
+
+  stanze:{
+    
+  },
+
+  stanzeView:{
+    marginBottom: 10
+  },
+
+  bottoneGioca: {
+    marginBottom:'20%'
+  },
+
   inputNickname: {
     height: 30,
     margin: '1%',
@@ -193,9 +208,16 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     borderRadius: 5,
   },
+
+  user: {
+    color: 'red'
+  }, 
+
+  
+
   titleNick: {
     position: 'absolute',
-    color: 'red',
+    color: '#0E5E6F',
     fontSize: '20%',
     fontWeight: 'bold',
     alignItems: 'center',

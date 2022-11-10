@@ -172,7 +172,7 @@ export default class CreaPartita extends React.Component {
     }
 
     generaCarta = () => {
-        //console.log(await AsyncStorage.getItem("username"))
+        //riempe tabella tutta di num casuali con il range di quella riga in base colona poi li buca rimuovendoli e per sapere chi clicchi mete x
         const tools = new RandTools();
         const extract_pool = [];
         var card = [[], [], []];
@@ -314,7 +314,7 @@ export default class CreaPartita extends React.Component {
                 <View style={styles.buttonIniziaPartita}>
                     {
                         this.state.partitaIniziata == false ?
-                            <Button style={styles.buttonIniziaPartita} color="red" title="Inizia partita" onPress={async () => {
+                            <Button style={styles.buttonIniziaPartita} color="#0E5E6F" title="Inizia partita" onPress={async () => {
                                 socket.emit("gameStart", await AsyncStorage.getItem("id"))
                             }}></Button>
                             : <></>
@@ -333,20 +333,20 @@ export default class CreaPartita extends React.Component {
                 <Text style={styles.divNumero}>E' uscito il numero: </Text>
                 <Text style={styles.numero}>{this.state.numero}</Text>
                 <View style={styles.viewBottoniPunteggi}>
-                    <Button color="red" title="Terno" disabled={this.state.statoBottoneTerno} onPress={() => this.provaTerno()} />
-                    <Button color="red" title="Cinquina" disabled={this.state.statoBottoneCinquina} onPress={() => this.provaCinquina()} />
-                    <Button color="red" title="Tombola!" disabled={this.state.statoBottoneTombola} onPress={() => this.provaTombola()} />
+                    <Button color="#0E5E6F" title="Terno" disabled={this.state.statoBottoneTerno} onPress={() => this.provaTerno()} />
+                    <Button color="#0E5E6F" title="Cinquina" disabled={this.state.statoBottoneCinquina} onPress={() => this.provaCinquina()} />
+                    <Button color="#0E5E6F" title="Tombola!" disabled={this.state.statoBottoneTombola} onPress={() => this.provaTombola()} />
                 </View>
                 <ScrollView style={styles.viewLog}>
                     {
                         this.state.messaggi.map((mess) => {
                             return (
-                                <Text>{mess}</Text>
+                                <Text style={{ color:"#f7fcfc" }}>{mess}</Text>
                             )
                         })
                     }
                 </ScrollView>
-                <Button color="red" title='Exit' onPress={() => this.esciDallaPartita()}></Button>
+                <Button color="#0E5E6F" title='Exit' onPress={() => this.esciDallaPartita()}></Button>
             </View>
         );
 
@@ -362,7 +362,7 @@ export default class CreaPartita extends React.Component {
         const renderTabBar = (props) => (
             <TabBar
                 {...props}
-                style={{ backgroundColor: "red" }}
+                style={{ backgroundColor: "#0E5E6F" }}
             />
         );
         if (this.state.statoPartitaFinita == false) {
@@ -389,7 +389,7 @@ export default class CreaPartita extends React.Component {
                     <Text style={styles.titleNick}>Il giocatore {this.state.listaGiocatoriRisultati[0]} ha fatto TOMBOLA</Text>
                     <Text style={styles.titleNick}>Il giocatore {this.state.listaGiocatoriRisultati[0]} ha VINTO</Text>
 
-                    <Button color="red" title='Exit' onPress={() => this.props.navigation.navigate('Home')}></Button>
+                    <Button color="#0E5E6F" title='Exit' onPress={() => this.props.navigation.navigate('Home')}></Button>
                     <StatusBar style="auto" />
                 </View>
             );
@@ -400,7 +400,7 @@ export default class CreaPartita extends React.Component {
 
 const styles = StyleSheet.create({
 
-    containerPartita: { flex: 1, padding: 16, paddingTop: 30, backgroundColor: 'yellow' },
+    containerPartita: { flex: 1, padding: 16, paddingTop: 30, backgroundColor: '#F2DEBA' },
     head: { height: 40, backgroundColor: '#f1f8ff' },
     text: { margin: 2, alignItems: 'center' },
     row: { flexDirection: 'row', backgroundColor: 'white' },
@@ -431,7 +431,7 @@ const styles = StyleSheet.create({
     },
 
     viewLog: {
-        backgroundColor: "#F5D6BA",
+        backgroundColor: "#427580",
         paddingTop: 10,
         paddingLeft: 10,
         height: 100,
@@ -448,13 +448,13 @@ const styles = StyleSheet.create({
 
     containerHome: {
         flex: 1,
-        backgroundColor: 'yellow',
+        backgroundColor: '#F2DEBA',
         alignItems: 'center',
         justifyContent: 'center',
     },
 
     containerTabellone: {
-        backgroundColor: 'yellow',
+        backgroundColor: '#F2DEBA',
         height: '100%'
     },
 

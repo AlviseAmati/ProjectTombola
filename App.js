@@ -11,26 +11,25 @@ import socket from './utils/socket.js';
 const Stack = createNativeStackNavigator();
 
 export default function App() {
-    var currentIndex = 0; 
-    return (
-      
-      <NavigationContainer>
-         <Stack.Navigator>
-            <Stack.Screen options={{ headerShown: true, headerLeft: () => null }} name="Home" component={Menu} />
-            <Stack.Screen options={{ headerShown: true, headerLeft: () => null }} name="Partita" component={CreaPartita} />
-            
-         </Stack.Navigator>
-      </NavigationContainer>
-     
-    );
-  }
-  
-  const styles = StyleSheet.create({
-    container: {
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-      height: '100vh',
-      textAlign: 'center',
-    },
-  });
+  var currentIndex = 0;
+  return (
+
+    <NavigationContainer>
+      <Stack.Navigator>
+        <Stack.Screen options={{ headerShown: true, headerLeft: () => null, headerStyle: {backgroundColor: "#0E5E6F"}, headerTitleStyle: {  color: "#EEEEEE" } }} name="Home" component={Menu} />
+        <Stack.Screen options={{headerShown: true, headerLeft: () => null, headerStyle: { backgroundColor: "#0E5E6F"}, headerTitleStyle: { color: "#EEEEEE" }}} name="Partita" component={CreaPartita} />
+      </Stack.Navigator>
+    </NavigationContainer>
+
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: '100vh',
+    textAlign: 'center',
+  },
+});
