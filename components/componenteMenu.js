@@ -104,7 +104,6 @@ export default class Menu extends React.Component {
   }
 
   eseguiBottonePartita = () => {
-    //this.setState({ partitaCreata: !this.state.partitaCreata })
     socket.emit("createRoom","Stanza")
   }
 

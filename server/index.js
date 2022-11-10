@@ -42,7 +42,7 @@ function trovaGameDaUnPlayer(id){
 socketIO.on("connection", (socket) => {
 	console.log(`⚡: ${socket.id} user just connected!`);
 
-	socket.on("createRoom", (name) => {
+	socket.on("createRoom", (name) => { //riceve messaggio dal client
 		chatRooms.unshift({ id: generateID(),iniziata: false, giocatori: [], name, numeriEstratti:[], numeriDaEstrarre: creaArrayDaEstrarre()});
 		socket.emit("roomsList", chatRooms);
 	});
@@ -139,8 +139,7 @@ function estraiNumero(numeriDaEstrarre,numeriEstratti,id){
         numeriEstratti.push(numeroEstratto)
         socketIO.to(id).emit("numeroEstratto",numeriDaEstrarre[random])
         numeriDaEstrarre.splice(random, 1);
-        /*console.log("Numeri estratti: " + numeriEstratti.length)
-        console.log("Numeri da estrarre: " + numeriDaEstrarre.length)*/
+       
         setTimeout(() => {estraiNumero(numeriDaEstrarre,numeriEstratti,id)}, 4500)
     }
 }
