@@ -6,7 +6,7 @@ import { createNativeStackNavigator } from '@react-navigation/stack';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import socket from "../utils/socket"
 import ModalErrore from './modalErrore';
-import { timingSafeEqual } from 'crypto';
+
 
 export default class Menu extends React.Component {
   constructor(props) { //per passare proprieta did ef acnhe il navigation
@@ -37,7 +37,7 @@ export default class Menu extends React.Component {
 
   makeRequest = () => {
     const fetchGroups = () => {
-			fetch("http://192.168.1.128:4000/api") // err 404 faild to fetch
+			fetch("http://192.168.68.109:4000/api") // err 404 faild to fetch
 				.then((res) => res.json())
 				.then((data) => {
           console.log("Stanze")

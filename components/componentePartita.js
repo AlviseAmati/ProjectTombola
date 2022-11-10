@@ -137,7 +137,7 @@ export default class CreaPartita extends React.Component {
                 }
 
                 this.setState({ listaGiocatoriRisultati: copyArrRes})
-                this.setState({ statoPartitaFinita: true})
+                this.setState({ statoPartitaFinita: true}) //fa vedere menu fine parta
             })
         })
 
@@ -288,6 +288,7 @@ export default class CreaPartita extends React.Component {
                         console.log(indice)
                         if(indice != -1){
                             contatoreCelle++;
+                            contatoreTotale++;
                         }
                     }
                 }
@@ -419,8 +420,8 @@ const styles = StyleSheet.create({
     },
 
     buttonIniziaPartita: {
-        borderRadius: "5px",
-        marginBottom: "20px"
+        borderRadius: 5,
+        marginBottom: 20
     },
 
     viewBottoniPunteggi: {
@@ -431,12 +432,12 @@ const styles = StyleSheet.create({
 
     viewLog: {
         backgroundColor: "#F5D6BA",
-        paddingTop: "10px",
-        paddingLeft: "10px",
-        height: "100px",
-        marginTop: "20px",
-        marginBottom: "20px",
-        borderRadius: "5px"
+        paddingTop: 10,
+        paddingLeft: 10,
+        height: 100,
+        marginTop: 20,
+        marginBottom: 20,
+        borderRadius: 5
     },
 
     tablePartita: {
