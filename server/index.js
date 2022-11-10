@@ -65,14 +65,6 @@ socketIO.on("connection", (socket) => {
                 socket.emit("roomEntered", chatRooms[i].id);
             }
         }
-        /*socket.join(result[0].name);
-        socket.join(result[0].id)
-        
-        socketIO.to(result[0].id).emit("listaUtenti",obj.username)
-        console.log(result)
-		// console.log(chatRooms);
-		socket.emit("roomEntered", result[0].id);
-		// console.log("Messages Form", result[0].messages);*/
 	});
 
 	socket.on("disconnect", () => {
@@ -88,8 +80,28 @@ socketIO.on("connection", (socket) => {
         setInterval(() => {estraiNumero(socket,result[0].numeriDaEstrarre, result[0].numeriEstratti,result[0].id)}, 5500)
     })
 
-    socket.on("terno", () => {
+    socket.on("terno", (id) => {
         console.log('terno')
+        console.log(id)
+        let result = chatRooms.filter((room) => room.id == id); 
+        console.log(result)
+        socketIO.to(id).emit("terno")
+        
+    })
+    socket.on("cinquina", (id) => {
+        console.log('cinquina')
+        console.log(id)
+        let result = chatRooms.filter((room) => room.id == id); 
+        console.log(result)
+        socketIO.to(id).emit("cinquina")
+        
+    })
+    socket.on("tombola", (id) => {
+        console.log('tombola')
+        console.log(id)
+        let result = chatRooms.filter((room) => room.id == id); 
+        console.log(result)
+        socketIO.to(id).emit("tombola")
         
     })
 });

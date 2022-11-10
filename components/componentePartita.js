@@ -162,7 +162,7 @@ export default class CreaPartita extends React.Component {
         return card;
     }
 
-    disabilitaBottoneTerno = () => {
+    disabilitaBottoneTerno = async() => {
         console.log('bottone terno cliccato')
         for (var i=0; i < this.state.tabelle.length; i++) {
             console.log('tabella')
@@ -184,15 +184,14 @@ export default class CreaPartita extends React.Component {
                     }
                 }
                 if (contatoreCelle >= 3) {
-                    socket.emit('terno')
-                    console.log('terno')
+                    socket.emit('terno',await AsyncStorage.getItem("id"))
                     return
                 }
             }
         }
        
     }
-    disabilitaBottoneCinquina = () => {
+    disabilitaBottoneCinquina = async() => {
         for (var i; i < this.state.tabelle.length; i++) {
             var tabella = this.state.tabelle[i]
             for (var r; r < tabella.lengt; r++) { //ciclo riga
@@ -205,7 +204,7 @@ export default class CreaPartita extends React.Component {
                     }
                 }
                 if (contatoreCelle >= 5) {
-                    socket.emit('cinquina')
+                    socket.emit('cinquina',await AsyncStorage.getItem("id"))
                     console.log('cinquina')
                     return
                 }
@@ -213,7 +212,7 @@ export default class CreaPartita extends React.Component {
         }
       
     }
-    disabilitaBottoneTombola = () => {
+    disabilitaBottoneTombola = async() => {
         for (var i; i < this.state.tabelle.length; i++) {
             var tabella = this.state.tabelle[i]
             var contatoreTotale =0;
@@ -230,7 +229,7 @@ export default class CreaPartita extends React.Component {
                
             }
             if (contatoreTotale = 15) {
-                socket.emit('tombola')
+                socket.emit('tombola',await AsyncStorage.getItem("id"))
                 console.log('tombola')
                 return
             }
@@ -292,10 +291,10 @@ export default class CreaPartita extends React.Component {
 
         const SecondRoute = () => {
             return (
-                <>
+                <View style={styles.containerTabellone}>
                     <Tabellone tabella={this.state.tabellone} />
                     <View style={{ height: 25 }} />
-                </>
+                </View>
             )
         }
 
@@ -370,6 +369,12 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
     },
+
+    containerTabellone: {
+        backgroundColor: 'yellow',
+        height: '100%'
+    },
+
     titleHome: {
         position: 'absolute',
         color: 'red',
