@@ -38,7 +38,7 @@ export default class Menu extends React.Component {
 
   makeRequest = () => {
     const fetchGroups = () => {
-			fetch("http://192.168.1.128:4000/api") // err 404 faild to fetch
+			fetch("http://172.20.10.9:4000/api") // err 404 faild to fetch
 				.then((res) => res.json())
 				.then((data) => {
           console.log("Stanze")

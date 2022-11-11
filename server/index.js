@@ -154,7 +154,7 @@ function estraiNumero(numeriDaEstrarre,numeriEstratti,id){
         socketIO.to(id).emit("numeroEstratto",numeriDaEstrarre[random])
         numeriDaEstrarre.splice(random, 1);
        
-        setTimeout(() => {estraiNumero(numeriDaEstrarre,numeriEstratti,id)}, 1500)
+        setTimeout(() => {estraiNumero(numeriDaEstrarre,numeriEstratti,id)}, 4000)
     }
 }
 
