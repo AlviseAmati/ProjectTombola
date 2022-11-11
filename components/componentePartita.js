@@ -56,7 +56,7 @@ export default class CreaPartita extends React.Component {
             }
             arr.push(arr1)
         }
-        console.log(arr)
+        //console.log(arr)
         return arr
     }
 
@@ -78,11 +78,11 @@ export default class CreaPartita extends React.Component {
     }
 
     async componentDidMount() { //parte all' onLoad
-        console.log("COMPONENT DID MOUNT")
-        console.log(await AsyncStorage.getItem("username"))
+        //console.log("COMPONENT DID MOUNT")
+        //console.log(await AsyncStorage.getItem("username"))
         var id = await AsyncStorage.getItem("id")
         this.props.navigation.setOptions({ title: 'Stanza-' + id })
-        console.log(id)
+        //console.log(id)
 
         socket.on("partitaIniziata", () => {
             this.setState({ partitaIniziata: true })
@@ -114,7 +114,7 @@ export default class CreaPartita extends React.Component {
             socket.on("cinquinaFatta", ({id,username}) => {
                 this.setState({ statoBottoneCinquina: !this.state.statoBottoneCinquina });
                 var copyArrRes = this.state.listaGiocatoriRisultati
-                copyArrRes[0] = username 
+                copyArrRes[1] = username 
 
                 if(id == socket.id){
                     this.aggiungiMessaggio(`Hai fatto cinquina!`)
@@ -126,9 +126,10 @@ export default class CreaPartita extends React.Component {
             })
 
             socket.on("tombolaFatta", ({id,username}) => {
+                console.log("Tombola registrata")
                 this.setState({ statoBottoneTombola: !this.state.statoBottoneTombola });
                 var copyArrRes = this.state.listaGiocatoriRisultati
-                copyArrRes[0] = username 
+                copyArrRes[2] = username 
 
                 if(id == socket.id){
                     this.aggiungiMessaggio(`Hai fatto tombola!`)
@@ -138,6 +139,10 @@ export default class CreaPartita extends React.Component {
 
                 this.setState({ listaGiocatoriRisultati: copyArrRes})
                 this.setState({ statoPartitaFinita: true}) //fa vedere menu fine parta
+            })
+
+            socket.on("partitaFinita", () => {
+                this.setState({ statoPartitaFinita: true})
             })
         })
 
@@ -216,17 +221,17 @@ export default class CreaPartita extends React.Component {
     provaTerno = async() => {
         console.log('bottone terno cliccato')
         for (var i=0; i < this.state.tabelle.length; i++) {
-            console.log('tabella')
+            //console.log('tabella')
             var tabella = this.state.tabelle[i]
             for (var r=0; r < tabella.length; r++) { //ciclo riga
-                console.log('riga')
+                //console.log('riga')
                 var contatoreCelle = 0;
                 for (var c=0; c < tabella[r].length; c++) {//ciclo singole celle
-                    console.log('cella')
+                    //console.log('cella')
                     
                     if (tabella[r][c].toString().includes("X")) {
                         var indice = this.state.listaNumeri.indexOf(parseInt(tabella[r][c].toString().split('X')[0])) //controllo se numero e uscito
-                        console.log(indice)
+                        //console.log(indice)
                        if(indice != -1){
                         contatoreCelle++;
                        }
@@ -244,17 +249,17 @@ export default class CreaPartita extends React.Component {
     provaCinquina = async() => {
         console.log('bottone cinquina cliccato')
         for (var i=0; i < this.state.tabelle.length; i++) {
-            console.log('tabella')
+            //console.log('tabella')
             var tabella = this.state.tabelle[i]
             for (var r=0; r < tabella.length; r++) { //ciclo riga
-                console.log('riga')
+                //console.log('riga')
                 var contatoreCelle = 0;
                 for (var c=0; c < tabella[r].length; c++) {//ciclo singole celle
-                    console.log('cella')
+                    //console.log('cella')
                     
                     if (tabella[r][c].toString().includes("X")) {
                         var indice = this.state.listaNumeri.indexOf(parseInt(tabella[r][c].toString().split('X')[0])) //controllo se numero e uscito
-                        console.log(indice)
+                        //console.log(indice)
                         if(indice != -1){
                             contatoreCelle++;
                         }
@@ -262,7 +267,7 @@ export default class CreaPartita extends React.Component {
                     }
                 }
                 if (contatoreCelle == 5) {
-                    console.log("cinquina")
+                    //console.log("cinquina")
                     socket.emit('cinquina')
                     return
                 }
@@ -272,20 +277,20 @@ export default class CreaPartita extends React.Component {
     }
 
     provaTombola = async() => {
-        console.log('bottone cinquina cliccato')
+        console.log('bottone tombola cliccato')
         for (var i=0; i < this.state.tabelle.length; i++) {
-            console.log('tabella')
+            //console.log('tabella')
             var tabella = this.state.tabelle[i]
             var contatoreTotale = 0
             for (var r=0; r < tabella.length; r++) { //ciclo riga
-                console.log('riga')
+                //console.log('riga')
                 var contatoreCelle = 0;
                 for (var c=0; c < tabella[r].length; c++) {//ciclo singole celle
-                    console.log('cella')
+                    //console.log('cella')
                     
                     if (tabella[r][c].toString().includes("X")) {
                         var indice = this.state.listaNumeri.indexOf(parseInt(tabella[r][c].toString().split('X')[0])) //controllo se numero e uscito
-                        console.log(indice)
+                        //console.log(indice)
                         if(indice != -1){
                             contatoreCelle++;
                             contatoreTotale++;
@@ -299,11 +304,6 @@ export default class CreaPartita extends React.Component {
                 return
             }
         }
-    }
-
-    cambiaViewPunteggio = () => {
-        var variabile = true;
-        this.setState({ statoPartitaFinita: variabile });
     }
 
     render() {

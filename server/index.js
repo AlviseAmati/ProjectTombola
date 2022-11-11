@@ -51,10 +51,14 @@ socketIO.on("connection", (socket) => {
         for(var i = 0; i < chatRooms.length; i++){
             for(var j = 0; j < chatRooms[i].giocatori.length; j++){
                 if(chatRooms[i].giocatori[j].socket == socket.id){
-                    chatRooms[i].giocatori.splice(j, 1);
                     console.log("Rimosso utente dalla lobby")
                     socketIO.to(chatRooms[i].id).emit("playerUscito",{id: socket.id, username: chatRooms[i].giocatori[j].username})
-                    //console.log("Un giocatore è uscito dalla stanza")
+                    chatRooms[i].giocatori.splice(j, 1);
+                    if(chatRooms[i].giocatori.length == 0 && chatRooms[i].iniziata == true){
+                        chatRooms.splice(i, 1)
+                        console.log("room cancellata")
+                        return
+                    }
                 }
             }
         }
@@ -111,6 +115,7 @@ socketIO.on("connection", (socket) => {
 
     socket.on("cinquina", () => {
         const { room, player } = trovaGameDaUnPlayer(socket.id)
+        console.log("Cinquina fatta")
         if(room != null){
             socketIO.to(room.id).emit("cinquinaFatta",{
                 username: player.username,
@@ -121,11 +126,20 @@ socketIO.on("connection", (socket) => {
 
     socket.on("tombola", () => {
         const { room, player } = trovaGameDaUnPlayer(socket.id)
+        console.log("Tombola fatta")
         if(room != null){
             socketIO.to(room.id).emit("tombolaFatta",{
                 username: player.username,
                 id: socket.id
             })
+
+            console.log("Partita finita")
+            for(var i = 0; i < chatRooms.length; i++){
+                if(room.id == chatRooms[i].id){
+                    console.log("Cancello la room")
+                    chatRooms.splice(i,1)
+                }
+            }
         }
     })
 });
@@ -140,7 +154,7 @@ function estraiNumero(numeriDaEstrarre,numeriEstratti,id){
         socketIO.to(id).emit("numeroEstratto",numeriDaEstrarre[random])
         numeriDaEstrarre.splice(random, 1);
        
-        setTimeout(() => {estraiNumero(numeriDaEstrarre,numeriEstratti,id)}, 4500)
+        setTimeout(() => {estraiNumero(numeriDaEstrarre,numeriEstratti,id)}, 1500)
     }
 }
 
