@@ -50,7 +50,7 @@ export default class Menu extends React.Component {
 		fetchGroups();
   }
 
-  getData = async () => { //per leggere i dati salvati
+  getData = async () => { //per leggere i dati salvati  questo e sotto non usati tutti
     try {
       const chiave = await AsyncStorage.getItem('token')
       const username = await AsyncStorage.getItem('username');
@@ -102,6 +102,7 @@ export default class Menu extends React.Component {
 
     //socket.emit("newMessage", {});
   }
+////////////////////////////////////////////////////////// Inizio funzioni view stanze
 
   eseguiBottonePartita = () => {
     socket.emit("createRoom","Stanza")
@@ -144,7 +145,7 @@ export default class Menu extends React.Component {
             <Button color="#0E5E6F" title='Crea Partita' onPress={() => this.eseguiBottonePartita()}></Button>
           </View>
           {
-            this.state.errorePartita ? <ModalErrore disableModal={this.disableModal}/> : <></>
+            this.state.errorePartita ? <ModalErrore disableModal={this.disableModal}/> : <></>//operatore ternario ?true :false
           }
           {
             this.state.stanze != null ? 

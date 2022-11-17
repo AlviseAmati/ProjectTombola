@@ -36,11 +36,11 @@ export default class Tabellone extends React.Component {
                 {
                     cell != "" ? 
                         cell.includes("X") ? 
-                            <TouchableHighlight style={{justifyContent: 'center', minHeight: 50}} onPress={() => {this._alertIndex(indexRow,indexCell)}}>
+                            <TouchableHighlight style={{justifyContent: 'center', minHeight: 50}}>
                                 <Text style={{color: "red !important",borderRadius:"15px", textAlign: "center",  backgroundColor:'#06537d'}}>{cell.replace('X',"")}</Text>
                             </TouchableHighlight>
                         : 
-                        <TouchableHighlight style={{justifyContent: 'center', minHeight: 50}} onPress={() => {this._alertIndex(indexRow,indexCell)}}>
+                        <TouchableHighlight style={{justifyContent: 'center', minHeight: 50}} >
                             <Text style={{color: "black !important",textAlign: "center", paddingBottom: 10, paddingTop: 5}}>{cell}</Text>
                         </TouchableHighlight>
                     :
